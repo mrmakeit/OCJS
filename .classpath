@@ -3,7 +3,11 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="/home/blixa/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/MC1.7.10-1.4.9.35/b963ed8b1fb8d3a916906b574ec3fba9a6e41fc5/OpenComputers-MC1.7.10-1.4.9.35-api.jar" sourcepath="/home/blixa/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/MC1.7.10-1.4.9.35/e98841900247c5fbfe62e9bc3f2c35981f8197ee/OpenComputers-MC1.7.10-1.4.9.35-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/home/blixa/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/MC1.7.10-1.4.9.35/b963ed8b1fb8d3a916906b574ec3fba9a6e41fc5/OpenComputers-MC1.7.10-1.4.9.35-api.jar" sourcepath="/home/blixa/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/MC1.7.10-1.4.9.35/e98841900247c5fbfe62e9bc3f2c35981f8197ee/OpenComputers-MC1.7.10-1.4.9.35-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/home/blixa/Desktop/OpenComputers-MC1.7.10-1.4.9.35-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="/home/blixa/.gradle/caches/minecraft/net/minecraftforge/forge/1.7.10-10.13.2.1230/forgeBin-1.7.10-10.13.2.1230.jar"/>
 	<classpathentry exported="true" kind="lib" path="/home/blixa/.gradle/caches/modules-2/files-2.1/net.minecraft/launchwrapper/1.11/9c0592c6e1e9ea296a70948081bd4cc84dda1289/launchwrapper-1.11.jar" sourcepath="/home/blixa/.gradle/caches/modules-2/files-2.1/net.minecraft/launchwrapper/1.11/ea64c0bce5e9f465cd56566530133331568d2157/launchwrapper-1.11-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="/home/blixa/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/1.3.9/40719ea6961c0cb6afaeb6a921eaa1f6afd4cfdf/jsr305-1.3.9.jar"/>

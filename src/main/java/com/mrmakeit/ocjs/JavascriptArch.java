@@ -15,7 +15,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public class JavascriptArch implements Architecture {
 
 	private Machine machine;
-	private Context vm;
+	private javascriptAPI vm;
 	
 	public JavascriptArch(Machine machine) {
 		this.machine = machine;
@@ -32,8 +32,7 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public boolean initialize() {
-		vm = Context.enter();
-		Scriptable scope = vm.initStandardObjects();
+		vm = new javascriptAPI();
 		//TODO: init signals.
 		return true;
 	}
@@ -59,7 +58,9 @@ public class JavascriptArch implements Architecture {
 			if (signal != null){
 				System.out.println(signal.name());
 				System.out.println(signal.args());
+				vm.run(signal);
 			}
+			machine.update();
 			return new ExecutionResult.Sleep(0);
 		}
 	}
