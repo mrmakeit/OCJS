@@ -6,3 +6,4 @@
 /bin
 options.txt
 usernamecache.json
+*.log

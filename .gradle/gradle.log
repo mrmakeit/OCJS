@@ -10,28 +10,175 @@
 :apiClasses UP-TO-DATE
 :sourceMainJava
 :compileJavawarning: [options] bootstrap class path not set in conjunction with -source 1.6
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/ComputerAPI.java:5: error: package org.mozilla.javascript does not exist
+import org.mozilla.javascript.Scriptable;
+                             ^
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/ComputerAPI.java:6: error: package org.mozilla.javascript does not exist
+import org.mozilla.javascript.ScriptableObject;
+                             ^
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/ComputerAPI.java:8: error: cannot find symbol
+public class ComputerAPI extends ScriptableObject{
+                                 ^
+  symbol: class ScriptableObject
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/ComputerAPI.java:15: error: cannot find symbol
+	void init(Scriptable scope){
+	          ^
+  symbol:   class Scriptable
+  location: class ComputerAPI
 /home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/JavascriptArch.java:3: error: package org.mozilla.javascript does not exist
 import org.mozilla.javascript.Context;
                              ^
 /home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/JavascriptArch.java:4: error: package org.mozilla.javascript does not exist
 import org.mozilla.javascript.Scriptable;
                              ^
-/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/JavascriptArch.java:18: error: cannot find symbol
-	private Context vm;
-	        ^
-  symbol:   class Context
-  location: class JavascriptArch
-/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/JavascriptArch.java:35: error: cannot find symbol
-		vm = Context.enter();
-		     ^
-  symbol:   variable Context
-  location: class JavascriptArch
-/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/JavascriptArch.java:36: error: cannot find symbol
-		Scriptable scope = vm.initStandardObjects();
-		^
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:11: error: package org.mozilla.javascript does not exist
+import org.mozilla.javascript.Context;
+                             ^
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:12: error: package org.mozilla.javascript does not exist
+import org.mozilla.javascript.NativeObject;
+                             ^
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:13: error: package org.mozilla.javascript does not exist
+import org.mozilla.javascript.Scriptable;
+                             ^
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:14: error: package org.mozilla.javascript does not exist
+import org.mozilla.javascript.ScriptableObject;
+                             ^
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:15: error: package org.mozilla.javascript.annotations does not exist
+import org.mozilla.javascript.annotations.*;
+^
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:21: error: cannot find symbol
+	Scriptable scope;
+	^
   symbol:   class Scriptable
-  location: class JavascriptArch
-5 errors
+  location: class javascriptAPI
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:77: error: cannot find symbol
+		public NativeObject list(){
+		       ^
+  symbol:   class NativeObject
+  location: class javascriptAPI.ComponentAPI
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:76: error: cannot find symbol
+		@JSFunction
+		 ^
+  symbol:   class JSFunction
+  location: class javascriptAPI.ComponentAPI
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:85: error: cannot find symbol
+		@JSFunction
+		 ^
+  symbol:   class JSFunction
+  location: class javascriptAPI.ComponentAPI
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/ComputerAPI.java:33: error: method does not override or implement a method from a supertype
+	@Override
+	^
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:25: error: cannot find symbol
+		Context cx = Context.enter();
+		                    ^
+  symbol:   method enter()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:26: error: cannot find symbol
+		scope = cx.initStandardObjects();
+		          ^
+  symbol:   method initStandardObjects()
+  location: variable cx of type Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:27: error: cannot find symbol
+		Context.exit();
+		       ^
+  symbol:   method exit()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:31: error: cannot find symbol
+		Context cx = Context.enter();
+		                    ^
+  symbol:   method enter()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:36: error: method toString in class Object cannot be applied to given types;
+			System.out.println(Context.toString(result));
+			                          ^
+  required: no arguments
+  found: Object
+  reason: actual and formal argument lists differ in length
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:41: error: cannot find symbol
+		Context.exit();
+		       ^
+  symbol:   method exit()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:44: error: cannot find symbol
+		Context cx = Context.enter();
+		                    ^
+  symbol:   method enter()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:46: error: cannot find symbol
+		ScriptableObject.putProperty(scope,"computer",jsComp);
+		^
+  symbol:   variable ScriptableObject
+  location: class javascriptAPI
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:47: error: cannot find symbol
+		Context.exit();
+		       ^
+  symbol:   method exit()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:50: error: cannot find symbol
+		Context cx = Context.enter();
+		                    ^
+  symbol:   method enter()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:52: error: cannot find symbol
+		ScriptableObject.putProperty(scope, "out", jsOut);
+		^
+  symbol:   variable ScriptableObject
+  location: class javascriptAPI
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:53: error: cannot find symbol
+		Context.exit();
+		       ^
+  symbol:   method exit()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:56: error: cannot find symbol
+		Context cx = Context.enter();
+		                    ^
+  symbol:   method enter()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:63: error: method toString in class Object cannot be applied to given types;
+		System.out.println(Context.toString(result));
+		                          ^
+  required: no arguments
+  found: Object
+  reason: actual and formal argument lists differ in length
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:64: error: method toString in class Object cannot be applied to given types;
+		System.out.println(Context.toString(result).equals(new String("shutdown")));
+		                          ^
+  required: no arguments
+  found: Object
+  reason: actual and formal argument lists differ in length
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:65: error: method toString in class Object cannot be applied to given types;
+		if(Context.toString(result).equals("shutdown")){
+		          ^
+  required: no arguments
+  found: Object
+  reason: actual and formal argument lists differ in length
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:66: error: cannot find symbol
+			Context.exit();
+			       ^
+  symbol:   method exit()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:69: error: cannot find symbol
+			Context.exit();
+			       ^
+  symbol:   method exit()
+  location: interface Context
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:79: error: cannot find symbol
+			NativeObject nobj = new NativeObject();
+			^
+  symbol:   class NativeObject
+  location: class javascriptAPI.ComponentAPI
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:79: error: cannot find symbol
+			NativeObject nobj = new NativeObject();
+			                        ^
+  symbol:   class NativeObject
+  location: class javascriptAPI.ComponentAPI
+/home/blixa/src/OCJS/build/sources/java/com/mrmakeit/ocjs/javascriptAPI.java:81: error: cannot find symbol
+			    nobj.defineProperty(entry.getKey(), entry.getValue(), NativeObject.READONLY);
+			                                                          ^
+  symbol:   variable NativeObject
+  location: class javascriptAPI.ComponentAPI
+37 errors
 1 warning
  FAILED
 
@@ -46,4 +193,4 @@ Run with --stacktrace option to get the stack trace. Run with --info or --debug 
 
 BUILD FAILED
 
-Total time: 8.731 secs
+Total time: 10.309 secs

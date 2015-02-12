@@ -1,19 +1,14 @@
 package com.mrmakeit.ocjs;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
 import li.cil.oc.api.machine.Architecture;
-import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.ExecutionResult;
 import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.Signal;
-import li.cil.oc.api.network.Component;
-import li.cil.oc.api.network.Node;
 import net.minecraft.nbt.NBTTagCompound;
 
 @Architecture.Name("JavaScript")
 public class JavascriptArch implements Architecture {
-
+	private boolean ready=false;
 	private Machine machine;
 	private javascriptAPI vm;
 	
@@ -23,7 +18,7 @@ public class JavascriptArch implements Architecture {
 	
 	@Override
 	public boolean isInitialized() {
-		return true;
+		return ready;
 	}
 
 	@Override
@@ -32,8 +27,11 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public boolean initialize() {
-		vm = new javascriptAPI();
-		//TODO: init signals.
+		vm = new javascriptAPI(machine);
+		vm.addComputer();
+		vm.addOut();
+		vm.init();
+		ready=true;
 		return true;
 	}
 
@@ -46,22 +44,24 @@ public class JavascriptArch implements Architecture {
 	public void runSynchronized() {
 		
 	}
-
 	@Override
 	public ExecutionResult runThreaded(boolean isSynchronizedReturn) {
 		if (isSynchronizedReturn){
 			return new ExecutionResult.Sleep(0);
 		}else{
-			Signal signal = machine.popSignal();
-			//TODO: Add some signals
-			//Signals are just a function to call.
-			if (signal != null){
-				System.out.println(signal.name());
-				System.out.println(signal.args());
-				vm.run(signal);
+			if(vm.limited){
+				vm.rerun();
+				return new ExecutionResult.Sleep(0);
+			}else{
+				Signal signal = machine.popSignal();
+				if (signal != null){
+					ExecutionResult result = vm.run(signal);
+					machine.update();
+					return result;
+				}else{
+					return new ExecutionResult.Sleep(0);
+				}
 			}
-			machine.update();
-			return new ExecutionResult.Sleep(0);
 		}
 	}
 
