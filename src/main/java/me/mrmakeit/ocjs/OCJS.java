@@ -1,4 +1,4 @@
-package com.mrmakeit.ocjs;
+package me.mrmakeit.ocjs;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;

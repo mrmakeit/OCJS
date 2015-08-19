@@ -1,4 +1,4 @@
-package com.mrmakeit.ocjs;
+package me.mrmakeit.ocjs;
 
 import java.io.IOException;
 import java.io.InputStream;

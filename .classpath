@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="/home/blixa/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/MC1.7.10-1.4.9.35/b963ed8b1fb8d3a916906b574ec3fba9a6e41fc5/OpenComputers-MC1.7.10-1.4.9.35-api.jar" sourcepath="/home/blixa/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/MC1.7.10-1.4.9.35/e98841900247c5fbfe62e9bc3f2c35981f8197ee/OpenComputers-MC1.7.10-1.4.9.35-sources.jar">
+	<classpathentry kind="lib" path="/home/blixa/Downloads/OpenComputers-MC1.7.10-1.5.15.31-api.jar" sourcepath="/home/blixa/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/MC1.7.10-1.4.9.35/e98841900247c5fbfe62e9bc3f2c35981f8197ee/OpenComputers-MC1.7.10-1.4.9.35-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/home/blixa/Desktop/OpenComputers-MC1.7.10-1.4.9.35-javadoc.jar!/"/>
 		</attributes>
@@ -67,7 +67,7 @@
 	<classpathentry exported="true" kind="lib" path="/home/blixa/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/17.0/9c6ef172e8de35fd8d4d8783e4821e57cdef7445/guava-17.0.jar" sourcepath="/home/blixa/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/17.0/7ca0efbeb87ca845b5d7a0ac9c21a4b7b95f7b28/guava-17.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="/home/blixa/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.3.2/90a3822c38ec8c996e84c16a3477ef632cbc87a3/commons-lang3-3.3.2.jar" sourcepath="/home/blixa/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.3.2/d2a489573c0ed2c4942b3660decad5d65087b406/commons-lang3-3.3.2-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="/home/blixa/.gradle/caches/minecraft/net/minecraftforge/forge/1.7.10-10.13.2.1230/start"/>
-	<classpathentry exported="true" kind="lib" path="/home/blixa/Desktop/js.jar">
+	<classpathentry kind="lib" path="/home/blixa/Downloads/js.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/home/blixa/Desktop/javadoc/"/>
 		</attributes>

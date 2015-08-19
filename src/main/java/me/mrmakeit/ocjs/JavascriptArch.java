@@ -1,9 +1,10 @@
-package com.mrmakeit.ocjs;
+package me.mrmakeit.ocjs;
 
 import li.cil.oc.api.machine.Architecture;
 import li.cil.oc.api.machine.ExecutionResult;
 import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.Signal;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 @Architecture.Name("JavaScript")
@@ -19,10 +20,6 @@ public class JavascriptArch implements Architecture {
 	@Override
 	public boolean isInitialized() {
 		return ready;
-	}
-
-	@Override
-	public void recomputeMemory() {
 	}
 
 	@Override
@@ -75,6 +72,11 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public void save(NBTTagCompound nbt) {
+	}
+
+	@Override
+	public boolean recomputeMemory(Iterable<ItemStack> arg0) {
+		return false;
 	}
 	
 }
