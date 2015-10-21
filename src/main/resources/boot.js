@@ -39,11 +39,8 @@ function dec2string(arr){
 	return string
 }
 function loadEeprom(){
-	cont = dec2string(computer.invoke(getEepromAddr(),"get",[])[0])
-	out.println(cont);
+	cont = dec2string(computer.invoke(getEepromAddr(),"get",[])[0]);
 	eval(cont);
 }
-out.println(computer.invoke(getEepromAddr(),"get",[])[0])
-out.println(dec2string(computer.invoke(getEepromAddr(),"get",[])[0]))
 
 loadEeprom()

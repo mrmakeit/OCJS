@@ -76,7 +76,7 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public boolean recomputeMemory(Iterable<ItemStack> arg0) {
-		return false;
+		return true;
 	}
 	
 }
