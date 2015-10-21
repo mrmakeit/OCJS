@@ -72,5 +72,6 @@
 			<attribute name="javadoc_location" value="file:/home/blixa/Desktop/javadoc/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/home/blixa/Downloads/OpenComputers-MC1.7.10-1.5.19.37-api.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

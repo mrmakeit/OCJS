@@ -1,46 +1,32 @@
-function event(){
-};
-
-function list(name){
-	if(name){
-		components = {}
-		allComp=computer.list();
-		for(comp in allComp){
-			if(allComp[comp].indexOf(name)>=0){
-				components[comp] = allComp[comp];
-				out.println(comp);
-			}
-		}
-	}else{
-		components = computer.list();
-	}
-	return components;
-}
-
-function getEepromAddr(){
-	comps = list('eeprom')
-	for(var k in comps){
-		return k
-	}
-}
-
-function printObject(obj){
-	for(var k in obj){
-		out.println(k);
-		out.println(obj[k]);
-	}
-}
-function dec2string(arr){
+var dec2string = function(arr){
 	string = ""
-	out.println(arr.length)
 	for(var x in arr){
 		string = string + String.fromCharCode(arr[x])
 	}
+	out.println(string);
 	return string
 }
-function loadEeprom(){
-	cont = dec2string(computer.invoke(getEepromAddr(),"get",[])[0]);
+
+var error = function(text){
+	component.error(text);
+}
+
+var loadEeprom = function(){
+	var eeprom = null;
+	allComp=component.list();
+	for(comp in allComp){
+		if(allComp[comp]=="eeprom"){
+			eeprom = comp;
+			break;
+		}
+	}
+	out.println(eeprom);
+	out.println(component.invoke(eeprom,"get",[]));
+	cont = dec2string(component.invoke(eeprom,"get",[])[0]);
+	var loadEeprom = undefined
+	out.println(cont);
 	eval(cont);
 }
+
 
 loadEeprom()

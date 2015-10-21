@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.util.Map;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -31,8 +32,7 @@ public class javascriptAPI {
 		InputStream stream = javascriptAPI.class.getClassLoader().getResourceAsStream("boot.js");
 		Reader read = new InputStreamReader(stream);
 		try {
-			Object result = cx.evaluateReader(scope, read, "boot", 1, null);
-			System.out.println(Context.toString(result));
+			cx.evaluateReader(scope, read, "boot", 1, null);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,7 +51,7 @@ public class javascriptAPI {
 	public void addComputer(){
 		Context.enter();
 		Object jsComp = Context.javaToJS(new ComponentAPI(), scope);
-		ScriptableObject.putProperty(scope,"computer",jsComp);
+		ScriptableObject.putProperty(scope,"component",jsComp);
 		Context.exit();
 	}
 	public void addOut(){
@@ -89,10 +89,14 @@ public class javascriptAPI {
 			return nobj;
 		}
 		@JSFunction
-		public Object[] invoke(String address, String method, Object[] params){
+		public NativeArray invoke(String address, String method, Object[] params){
 			try {
 				Object[] result = machine.invoke(address,method,params);
-				return result;
+				NativeArray toReturn = new NativeArray(result.length);
+				for (Object element : result){
+					toReturn.add(element);
+				}
+				return toReturn;
 			}
 			catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -100,8 +104,16 @@ public class javascriptAPI {
 				next[1]=method;
 				next[2]=params;
 				limited=true;
-				return new Object[]{false};
+				NativeArray result = new NativeArray(1);
+				result.add(false);
+				return result;
 			}
+		}
+
+		@JSFunction
+		public Object[] error(String message){
+			boolean state = machine.crash(message);
+			return new Object[]{state};
 		}
 
 	}
