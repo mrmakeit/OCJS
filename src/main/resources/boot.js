@@ -3,7 +3,6 @@ var dec2string = function(arr){
 	for(var x in arr){
 		string = string + String.fromCharCode(arr[x])
 	}
-	out.println(string);
 	return string
 }
 
@@ -11,22 +10,22 @@ var error = function(text){
 	component.error(text);
 }
 
-var loadEeprom = function(){
-	var eeprom = null;
-	allComp=component.list();
+var getComponentList = function(type){
+	var allComp = component.list();
+	var results = []
 	for(comp in allComp){
-		if(allComp[comp]=="eeprom"){
-			eeprom = comp;
-			break;
+		if(allComp[comp] == type){
+			results.push(comp);
 		}
 	}
-	out.println(eeprom);
-	out.println(component.invoke(eeprom,"get",[]));
-	cont = dec2string(component.invoke(eeprom,"get",[])[0]);
-	var loadEeprom = undefined
-	out.println(cont);
-	eval(cont);
+	return results;
 }
 
+var loadEeprom = function(){
+	var eeprom = getComponentList('eeprom')[0];
+	cont = dec2string(component.invoke(eeprom,"get",[])[0]);
+	var loadEeprom = undefined
+	component.eval("bios",cont);
+}
 
-loadEeprom()
+loadEeprom();

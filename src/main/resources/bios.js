@@ -3,29 +3,43 @@ var getComponentList = function(type){
 	var results = []
 	for(comp in allComp){
 		if(allComp[comp] == type){
-			out.println(comp);
 			results.push(comp);
 		}
 	}
 	return results;
 }
 
+console = {
+  line: 0,
+  log: function(text){
+    //text = JSON.stringify(text);
+    gpu = getComponentList('gpu')[0];
+    component.invoke(gpu, 'set', [0,console.line,text]);
+  }
+}
+
 var loadFrom = function(address){
-	out.println(address);
+	console.log(address);
+  console.log(component.invoke(address, 'list', ['']));
 	var handle = component.invoke(address, 'open', ['/init.js']);
 	if(!handle){
+    console.log("No File");
 		return false;
 	}
+  console.log(handle);
 	var buffer = "";
 	var data = "";
 	do{
 		data = component.invoke(address, "read", [handle, Number.MAX_VALUE]);
+    console.log(data);
 		if(data){
 			buffer = buffer + data
 		}
 	}while(data);
 	component.invoke(address,'close', [handle]);
-	eval(buffer);
+  console.log("Got Buffer");
+  console.log(buffer);
+	component.eval("Init.js",buffer);
 }
 
 var setScreens = function(){

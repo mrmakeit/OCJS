@@ -10,7 +10,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
  
-version = "0.4"
+version = "0.4.0"
 group= "me.mrmakeit.ocjs" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ocjs"
 
@@ -44,6 +44,7 @@ dependencies {
     //compile "some.group:artifact:version"
     compile "li.cil.oc:OpenComputers:MC1.10.2-1.6.+:api"
     compile group: 'org.mozilla', name: 'rhino', version: '1.7.7.2'
+    compile files('libs/*');
       
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env

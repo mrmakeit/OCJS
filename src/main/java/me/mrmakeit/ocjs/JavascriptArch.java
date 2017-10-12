@@ -26,7 +26,6 @@ public class JavascriptArch implements Architecture {
 	public boolean initialize() {
 		vm = new javascriptAPI(machine);
 		vm.addComputer();
-		vm.addOut();
 		vm.init();
 		ready=true;
 		return true;
@@ -77,6 +76,12 @@ public class JavascriptArch implements Architecture {
 	@Override
 	public boolean recomputeMemory(Iterable<ItemStack> arg0) {
 		return true;
+	}
+
+	@Override
+	public void onSignal() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
