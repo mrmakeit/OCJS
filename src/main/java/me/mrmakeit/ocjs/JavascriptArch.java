@@ -38,27 +38,11 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public void runSynchronized() {
-		
+    vm.runSync();		
 	}
 	@Override
 	public ExecutionResult runThreaded(boolean isSynchronizedReturn) {
-		if (isSynchronizedReturn){
-			return new ExecutionResult.Sleep(0);
-		}else{
-			if(vm.limited){
-				vm.rerun();
-				return new ExecutionResult.Sleep(0);
-			}else{
-				Signal signal = machine.popSignal();
-				if (signal != null){
-					ExecutionResult result = vm.run(signal);
-					machine.update();
-					return result;
-				}else{
-					return new ExecutionResult.Sleep(0);
-				}
-			}
-		}
+    return vm.runThreaded(isSynchronizedReturn);
 	}
 
 	@Override
