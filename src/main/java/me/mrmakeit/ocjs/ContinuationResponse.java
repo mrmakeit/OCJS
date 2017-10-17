@@ -8,7 +8,7 @@ import li.cil.oc.api.machine.Machine;
 public abstract class ContinuationResponse {
 
   public static enum ContinuationType {
-    SLEEP, DIRECT, INVOKE
+    SLEEP, DIRECT, INVOKE, EVAL
   }
 
   ContinuationType type;
@@ -26,7 +26,7 @@ public abstract class ContinuationResponse {
     public SleepResponse(Machine machine, int time){
       super(machine);
       this.time = time;
-      this.type = ContinuationType.DIRECT;
+      this.type = ContinuationType.SLEEP;
     }
     @Override
     public void resume(Context cx, Scriptable scope, Object continuation) {
@@ -37,6 +37,22 @@ public abstract class ContinuationResponse {
     public DirectResponse(Machine machine){
       super(machine);
       this.type = ContinuationType.DIRECT;
+    }
+    @Override
+    public void resume(Context cx, Scriptable scope, Object continuation) {
+      cx.resumeContinuation(continuation,scope,null);
+    }
+  }
+  public static class EvalResponse extends ContinuationResponse {
+    private Script script;
+    public EvalResponse(Machine machine, Script script){
+      super(machine);
+      this.script = script;
+      this.type = ContinuationType.EVAL;
+    }
+    public void executeScript(Context cx, Scriptable scope){
+      System.out.println("Running resumed script");
+      cx.executeScriptWithContinuations(script,scope);
     }
     @Override
     public void resume(Context cx, Scriptable scope, Object continuation) {

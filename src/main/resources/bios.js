@@ -39,7 +39,7 @@ var loadFrom = function(address){
 	component.invoke(address,'close', [handle]);
   console.log("Got Buffer");
   console.log(buffer);
-	component.eval("Init.js",buffer);
+	component.load(buffer,'/init.js');
 }
 
 var setScreens = function(){

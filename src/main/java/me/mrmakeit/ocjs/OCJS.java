@@ -24,7 +24,9 @@ public class OCJS
 				clazz = Class.forName("org.eclipse.wst.jsdt.debug.rhino.debugger.RhinoDebugger");
 				debugger = clazz.getConstructor(String.class).newInstance(rhino);
 				clazz.getMethod("start").invoke(debugger);
+        System.out.println("[JAVASCRIPT] Debugging enabled.  Portn 9000");
 			} catch (Throwable e) {
+        System.out.println("[JAVASCRIPT] No debugging libraries available.  Not enabled");
 			}
 
     	li.cil.oc.api.Machine.add(JavascriptArch.class);
@@ -40,7 +42,7 @@ public class OCJS
     public void stopping(FMLServerStoppingEvent event)
     {
       try{
-				clazz.getMethod("start").invoke(debugger);
+				clazz.getMethod("stop").invoke(debugger);
       }catch(Exception e){
 
       }

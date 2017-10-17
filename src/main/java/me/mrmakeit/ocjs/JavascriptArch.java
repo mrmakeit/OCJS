@@ -24,8 +24,8 @@ public class JavascriptArch implements Architecture {
 	@Override
 	public boolean initialize() {
 		vm = new JavascriptAPI(machine);
-		vm.addComputer();
 		vm.init();
+		vm.addComputer();
 		ready=true;
 		return true;
 	}

@@ -30,7 +30,10 @@ public class JavascriptAPI {
   public boolean initialized = false;
   
   public JavascriptAPI(Machine m) {
+    try{
     factory.addListener((ContextFactory.Listener)OCJS.debugger);
+    }catch(Throwable e){
+    }
     machine = m;
   }
   
@@ -49,8 +52,13 @@ public class JavascriptAPI {
   }
 
   public void runSync() {
-    Context cx = factory.enterContext();
     ContinuationPending c = pending;
+    ManageSyncPending(c);
+    Context.exit();
+  }
+
+  public void ManageSyncPending(ContinuationPending c){
+    Context cx = factory.enterContext();
     ContinuationResponse resp = (ContinuationResponse)c.getApplicationState();
     switch(resp.type) {
       case DIRECT:
@@ -61,10 +69,52 @@ public class JavascriptAPI {
         break;
       case SLEEP:
         System.out.println("How did we get here.  Sleep shouldn't lead to the runSync() method.  Please contact the mod author.");
-    }
-    Context.exit();
-  }
+        break;
+      case EVAL:
+        System.out.println("Running Sync Eval");
+        try{
+          ((EvalResponse)resp).executeScript(cx,scope);
+        } catch(ContinuationPending d){
+          ManageSyncPending(d);
+        }finally{
+          cx.resumeContinuation(c.getContinuation(),scope,null);
+        }
 
+    }
+  }
+  public ExecutionResult ManagePending(ContinuationPending c){
+    ExecutionResult result = null;
+    ContinuationResponse resp = (ContinuationResponse)c.getApplicationState();
+    switch(resp.type) {
+      case DIRECT:
+        result = new ExecutionResult.SynchronizedCall();
+        machine.update();
+        break;
+      case INVOKE:
+        result = new ExecutionResult.SynchronizedCall();
+        machine.update();
+        break;
+      case SLEEP:
+        int time = ((SleepResponse)resp).time;
+        result = new ExecutionResult.Sleep(time);
+        machine.update();
+        break;
+      case EVAL:
+        System.out.println("Running Eval");
+        Context cx = Context.getCurrentContext();
+        try{
+          ((EvalResponse)resp).executeScript(cx,scope);
+        } catch(ContinuationPending d){
+          result = ManagePending(d);
+        } catch(Exception e){
+          System.out.println("Oops? ");
+          e.printStackTrace();
+        }finally{
+          cx.resumeContinuation(c.getContinuation(),scope,null);
+        }
+    }
+    return result;
+  }
   public ExecutionResult runThreaded(boolean syncReturn) {
     Context cx = factory.enterContext();
     ExecutionResult result = null;
@@ -79,23 +129,8 @@ public class JavascriptAPI {
         System.out.println("Couldn't Find Boot.js in resources.  Can't start computer!");
         result = new ExecutionResult.Error("No Boot.js in mod resource.  Please notify the mod author");
       }catch (ContinuationPending c) {
-        ContinuationResponse resp = (ContinuationResponse)c.getApplicationState();
         pending = c;
-        switch(resp.type) {
-          case DIRECT:
-            result = new ExecutionResult.SynchronizedCall();
-            machine.update();
-            break;
-          case INVOKE:
-            result = new ExecutionResult.SynchronizedCall();
-            machine.update();
-            break;
-          case SLEEP:
-            int time = ((SleepResponse)resp).time;
-            result = new ExecutionResult.Sleep(time);
-            machine.update();
-            break;
-        }
+        result = ManagePending(c);
         initialized=true;
       }
     }else{      
@@ -103,20 +138,7 @@ public class JavascriptAPI {
       try {
         response.resume(cx,scope,pending.getContinuation());
       }catch (ContinuationPending c) {
-        ContinuationResponse resp = (ContinuationResponse)c.getApplicationState();
-        pending = c;
-        switch(resp.type) {
-          case DIRECT:
-            result = new ExecutionResult.SynchronizedCall();
-            machine.update();
-          case INVOKE:
-            result = new ExecutionResult.SynchronizedCall();
-            machine.update();
-          case SLEEP:
-            int time = ((SleepResponse)resp).time;
-            result = new ExecutionResult.Sleep(time);
-            machine.update();
-        }
+        result = ManagePending(c);
       }
     }
 
@@ -160,6 +182,23 @@ public class JavascriptAPI {
         Object[] result = null;
         return result;
       }
+    }
+    @JSFunction
+    public void eval(String scriptText){
+      System.out.println("Running script under eval");
+      ContinuationPending continuation = Context.getCurrentContext().captureContinuation();
+      Script script = Context.getCurrentContext().compileString(scriptText,"(eval)",1,null);
+      continuation.setApplicationState(new EvalResponse(machine,script));
+      throw continuation;
+    }
+    @JSFunction
+    public void load(String scriptText, String name){
+      System.out.println("Compiling script under "+name);
+      ContinuationPending continuation = Context.getCurrentContext().captureContinuation();
+      Script script = Context.getCurrentContext().compileString(scriptText,name,1,null);
+      continuation.setApplicationState(new EvalResponse(machine,script));
+      System.out.println("Compiled script under "+name);
+      throw continuation;
     }
     @JSFunction
     public NativeObject pullSignal(){
