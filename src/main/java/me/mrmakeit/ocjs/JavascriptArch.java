@@ -3,7 +3,6 @@ package me.mrmakeit.ocjs;
 import li.cil.oc.api.machine.Architecture;
 import li.cil.oc.api.machine.ExecutionResult;
 import li.cil.oc.api.machine.Machine;
-import li.cil.oc.api.machine.Signal;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -11,7 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public class JavascriptArch implements Architecture {
 	private boolean ready=false;
 	private Machine machine;
-	private javascriptAPI vm;
+	private JavascriptAPI vm;
 	
 	public JavascriptArch(Machine machine) {
 		this.machine = machine;
@@ -24,7 +23,7 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public boolean initialize() {
-		vm = new javascriptAPI(machine);
+		vm = new JavascriptAPI(machine);
 		vm.addComputer();
 		vm.init();
 		ready=true;
