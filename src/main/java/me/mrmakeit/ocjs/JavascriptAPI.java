@@ -30,7 +30,7 @@ public class JavascriptAPI {
   public boolean initialized = false;
   
   public JavascriptAPI(Machine m) {
-    factory.addListener(OCJS.debugger);
+    factory.addListener((ContextFactory.Listener)OCJS.debugger);
     machine = m;
   }
   
