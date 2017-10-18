@@ -15,7 +15,6 @@ public abstract class ContinuationResponse {
   Machine machine;
 
   public ContinuationResponse(Machine machine) {
-    System.out.println("Storing Continuation Response");
     this.machine = machine;
   }
 
@@ -52,7 +51,6 @@ public abstract class ContinuationResponse {
       this.type = ContinuationType.EVAL;
     }
     public void executeScript(Context cx, Scriptable scope){
-      System.out.println("Running resumed script");
       cx.executeScriptWithContinuations(script,scope);
     }
     @Override

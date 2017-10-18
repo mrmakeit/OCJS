@@ -12,8 +12,7 @@ import java.util.Map;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.Script; import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -46,8 +45,8 @@ public class JavascriptAPI {
 
   public void addComputer() {
     Context cx = factory.enterContext();
-    Object jsComp = Context.javaToJS(new ComponentAPI(), scope);
-    ScriptableObject.putProperty(scope,"component",jsComp);
+    Object jsComp = Context.javaToJS(new ComputerAPI(machine), scope);
+    ScriptableObject.putProperty(scope,"computer",jsComp);
     Function eval = cx.compileFunction(scope,"function eval(a){error('No, Dont Eval!')}","eval",1,null);
     ScriptableObject.putProperty(scope,"eval",eval);
     Context.exit();
@@ -70,7 +69,6 @@ public class JavascriptAPI {
         resp.resume(cx,scope,pending.getContinuation());
         break;
       case SLEEP:
-        System.out.println("How did we get here.  Sleep shouldn't lead to the runSync() method.  Please contact the mod author.");
         break;
       case EVAL:
         System.out.println("Running Sync Eval");
@@ -78,17 +76,22 @@ public class JavascriptAPI {
           ((EvalResponse)resp).executeScript(cx,scope);
         } catch(ContinuationPending d){
           ManageSyncPending(d);
+        } catch(Exception e){
+          System.out.println("Oops? ");
+          e.printStackTrace();
+	  machine.crash(e.getMessage());
+	  return;
         }finally{
-	  try{
+          try{
             cx.resumeContinuation(c.getContinuation(),scope,null);
           } catch(ContinuationPending d){
             ManageSyncPending(d);
           } catch(Exception e){
             System.out.println("Oops? ");
             e.printStackTrace();
+	    machine.crash(e.getMessage());
           }
         }
-
     }
   }
   public ExecutionResult ManagePending(ContinuationPending c){
@@ -118,16 +121,19 @@ public class JavascriptAPI {
         } catch(Exception e){
           System.out.println("Oops? ");
           e.printStackTrace();
+	  machine.crash(e.getMessage());
+	  return new ExecutionResult.Error(e.getMessage());
         }finally{
-	  try{
+          try{
             cx.resumeContinuation(c.getContinuation(),scope,null);
           } catch(ContinuationPending d){
             result = ManagePending(d);
           } catch(Exception e){
             System.out.println("Oops? ");
             e.printStackTrace();
+	    machine.crash(e.getMessage());
           }
-	}
+        }
     }
     return result;
   }
@@ -166,84 +172,4 @@ public class JavascriptAPI {
     return result;
   }
       
-  public class ComponentAPI {
-
-    public ComponentAPI() {
-    }
-
-    @JSFunction
-    public NativeObject list() {
-      Map<String, String> components = machine.components();
-      NativeObject nobj = new NativeObject();
-      for (Map.Entry<String, String> entry : components.entrySet()) {
-          nobj.defineProperty(entry.getKey(), entry.getValue(), NativeObject.READONLY);
-      }
-      return nobj;
-    }
-
-    @JSFunction
-    public Object[] invoke(String address, String method, Object[] params){
-      System.out.println("Running "+method+" on "+address);
-      try {
-        Object[] result = machine.invoke(address,method,params);
-        return result;
-      }
-      catch (LimitReachedException e){
-        System.out.println("Limit Reached");
-        ContinuationPending continuation = Context.getCurrentContext().captureContinuation();
-        continuation.setApplicationState(new LimitResponse(machine, address,method,params));
-        throw continuation;
-      }
-      catch (Exception e){
-        Object[] result = null;
-        return result;
-      }
-    }
-    @JSFunction
-    public void eval(String scriptText){
-      System.out.println("Running script under eval");
-      ContinuationPending continuation = Context.getCurrentContext().captureContinuation();
-      Script script = Context.getCurrentContext().compileString(scriptText,"(eval)",1,null);
-      continuation.setApplicationState(new EvalResponse(machine,script));
-      throw continuation;
-    }
-    @JSFunction
-    public void load(String scriptText, String name){
-      System.out.println("Compiling script under "+name);
-      ContinuationPending continuation = Context.getCurrentContext().captureContinuation();
-      Script script = Context.getCurrentContext().compileString(scriptText,name,1,null);
-      continuation.setApplicationState(new EvalResponse(machine,script));
-      System.out.println("Compiled script under "+name);
-      throw continuation;
-    }
-    @JSFunction
-    public NativeObject pullSignal(){
-      System.out.println("Fetching Signal");
-      Signal signal = machine.popSignal();
-      NativeObject nobj = new NativeObject();
-      nobj.defineProperty("name",signal.name(),NativeObject.READONLY);
-      nobj.defineProperty("args",signal.args(),NativeObject.READONLY);
-      return nobj;
-    }
-    @JSFunction
-    public void sleep(int time){
-      System.out.println("Sleeping for "+time+" seconds");
-      ContinuationPending continuation = Context.getCurrentContext().captureContinuation();
-      continuation.setApplicationState(new SleepResponse(machine, time));
-      throw continuation;
-    }
-    public void direct(){
-      System.out.println("Direct Function Call");
-      ContinuationPending continuation = Context.getCurrentContext().captureContinuation();
-      continuation.setApplicationState(new DirectResponse(machine));
-      throw continuation;
-    }
-    @JSFunction
-    public Object[] error(String message){
-      //boolean state = machine.crash(message);
-      boolean state = false;
-      System.out.println(message);
-      return new Object[]{state};
-    }
-  }
 }

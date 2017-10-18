@@ -7,11 +7,11 @@ var dec2string = function(arr){
 }
 
 var error = function(text){
-	component.error(text);
+	computer.error(text);
 }
 
 var getComponentList = function(type){
-	var allComp = component.list();
+	var allComp = computer.list();
 	var results = []
 	for(comp in allComp){
 		if(allComp[comp] == type){
@@ -24,10 +24,14 @@ var getComponentList = function(type){
 eval = null;
 
 var loadEeprom = function(){
-	var eeprom = getComponentList('eeprom')[0];
-	cont = dec2string(component.invoke(eeprom,"get",[])[0]);
-	var loadEeprom = undefined
-	component.load(cont,"<bios>");
+	var eepromList = getComponentList('eeprom');
+	if(eepromList.length>0){
+		cont = dec2string(computer.invoke(eepromList[0],"get",[])[0]);
+		var loadEeprom = undefined
+		computer.load(cont,"<bios>");
+	}else{
+		computer.error("No EEPROM Found");
+	}
 }
 
 loadEeprom();

@@ -1,5 +1,5 @@
 var getComponentList = function(type){
-	var allComp = component.list();
+	var allComp = computer.list();
 	var results = []
 	for(comp in allComp){
 		if(allComp[comp] == type){
@@ -9,37 +9,22 @@ var getComponentList = function(type){
 	return results;
 }
 
-console = {
-  line: 0,
-  log: function(text){
-    //text = JSON.stringify(text);
-    gpu = getComponentList('gpu')[0];
-    component.invoke(gpu, 'set', [0,console.line,text]);
-  }
-}
-
 var loadFrom = function(address){
-	console.log(address);
-	console.log(component.invoke(address, 'list', ['']));
-	var handle = component.invoke(address, 'open', ['/init.js']);
+	var handle = computer.invoke(address, 'open', ['/init.js']);
 	if(!handle){
-	console.log("No File");
 		return false;
 	}
-	console.log(handle);
 	var buffer = "";
 	var data = "";
 	do{
-		data = component.invoke(address, "read", [handle, Number.MAX_VALUE]);
-		console.log(data);
+		data = computer.invoke(address, "read", [handle, Number.MAX_VALUE]);
 		if(data){
 			buffer = buffer + data
 		}
 	}while(data);
-	component.invoke(address,'close', [handle]);
-	console.log("Got Buffer");
-	console.log(buffer);
-	component.load(buffer,'/init.js');
+	computer.invoke(address,'close', [handle]);
+	error(buffer);
+	computer.load(buffer,'/init.js');
 }
 
 var setScreens = function(){
@@ -47,7 +32,7 @@ var setScreens = function(){
 	var gpu = getComponentList('gpu')[0];
 	if(screen){
 		if(gpu){
-			component.invoke(gpu, 'bind', [screen]);
+			computer.invoke(gpu, 'bind', [screen]);
 		}
 	}
 }
@@ -61,6 +46,7 @@ var init = function(){
 			loadFrom(address);
 		}
 	}
+	error("No Bootable Medium Found");
 }
 
 init();
