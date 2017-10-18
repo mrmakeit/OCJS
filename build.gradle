@@ -42,7 +42,7 @@ dependencies {
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
-    compile "li.cil.oc:OpenComputers:MC1.10.2-1.6.+:api"
+    compile "li.cil.oc:OpenComputers:MC1.10.2-1.7.+:api"
     compile group: 'org.mozilla', name: 'rhino', version: '1.7.7.2'
     compile files('libs/*');
       

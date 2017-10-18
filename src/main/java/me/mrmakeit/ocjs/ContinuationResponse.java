@@ -15,6 +15,7 @@ public abstract class ContinuationResponse {
   Machine machine;
 
   public ContinuationResponse(Machine machine) {
+    System.out.println("Storing Continuation Response");
     this.machine = machine;
   }
 

@@ -20,25 +20,25 @@ console = {
 
 var loadFrom = function(address){
 	console.log(address);
-  console.log(component.invoke(address, 'list', ['']));
+	console.log(component.invoke(address, 'list', ['']));
 	var handle = component.invoke(address, 'open', ['/init.js']);
 	if(!handle){
-    console.log("No File");
+	console.log("No File");
 		return false;
 	}
-  console.log(handle);
+	console.log(handle);
 	var buffer = "";
 	var data = "";
 	do{
 		data = component.invoke(address, "read", [handle, Number.MAX_VALUE]);
-    console.log(data);
+		console.log(data);
 		if(data){
 			buffer = buffer + data
 		}
 	}while(data);
 	component.invoke(address,'close', [handle]);
-  console.log("Got Buffer");
-  console.log(buffer);
+	console.log("Got Buffer");
+	console.log(buffer);
 	component.load(buffer,'/init.js');
 }
 
@@ -56,11 +56,11 @@ var init = function(){
 	setScreens();
 	var drives = getComponentList('filesystem')
 	if(drives.length>0){
-		drives.forEach(function(address){
+		for(drive in drives){
+			address = drives[drive];
 			loadFrom(address);
-		});
+		}
 	}
-	error('No Bootable Medium Found!');
 }
 
 init();

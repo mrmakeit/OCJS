@@ -27,7 +27,7 @@ var loadEeprom = function(){
 	var eeprom = getComponentList('eeprom')[0];
 	cont = dec2string(component.invoke(eeprom,"get",[])[0]);
 	var loadEeprom = undefined
-	component.load(cont,"test");
+	component.load(cont,"<bios>");
 }
 
 loadEeprom();

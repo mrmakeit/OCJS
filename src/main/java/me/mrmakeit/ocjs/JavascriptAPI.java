@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.util.Map;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ContinuationPending;
@@ -24,7 +25,7 @@ public class JavascriptAPI {
 
   Scriptable scope;
   Machine machine;
-  ContextFactory factory = new ContextFactory();
+  ContextFactory factory = new APIContextFactory();
   ContinuationPending pending;
 
   public boolean initialized = false;
@@ -39,15 +40,16 @@ public class JavascriptAPI {
   
   public void init() {
     Context cx = factory.enterContext();
-    scope = cx.initStandardObjects();
-    cx.setOptimizationLevel(-1);
+    scope = cx.initSafeStandardObjects();
     Context.exit();
   }
 
   public void addComputer() {
-    factory.enterContext();
+    Context cx = factory.enterContext();
     Object jsComp = Context.javaToJS(new ComponentAPI(), scope);
     ScriptableObject.putProperty(scope,"component",jsComp);
+    Function eval = cx.compileFunction(scope,"function eval(a){error('No, Dont Eval!')}","eval",1,null);
+    ScriptableObject.putProperty(scope,"eval",eval);
     Context.exit();
   }
 
@@ -77,7 +79,14 @@ public class JavascriptAPI {
         } catch(ContinuationPending d){
           ManageSyncPending(d);
         }finally{
-          cx.resumeContinuation(c.getContinuation(),scope,null);
+	  try{
+            cx.resumeContinuation(c.getContinuation(),scope,null);
+          } catch(ContinuationPending d){
+            ManageSyncPending(d);
+          } catch(Exception e){
+            System.out.println("Oops? ");
+            e.printStackTrace();
+          }
         }
 
     }
@@ -110,8 +119,15 @@ public class JavascriptAPI {
           System.out.println("Oops? ");
           e.printStackTrace();
         }finally{
-          cx.resumeContinuation(c.getContinuation(),scope,null);
-        }
+	  try{
+            cx.resumeContinuation(c.getContinuation(),scope,null);
+          } catch(ContinuationPending d){
+            result = ManagePending(d);
+          } catch(Exception e){
+            System.out.println("Oops? ");
+            e.printStackTrace();
+          }
+	}
     }
     return result;
   }
