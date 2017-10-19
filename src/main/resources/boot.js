@@ -3,30 +3,35 @@ var dec2string = function(arr){
 	for(var x in arr){
 		string = string + String.fromCharCode(arr[x])
 	}
-	out.println(string);
 	return string
 }
 
 var error = function(text){
-	component.error(text);
+	computer.error(text);
 }
 
-var loadEeprom = function(){
-	var eeprom = null;
-	allComp=component.list();
+var getComponentList = function(type){
+	var allComp = computer.list();
+	var results = []
 	for(comp in allComp){
-		if(allComp[comp]=="eeprom"){
-			eeprom = comp;
-			break;
+		if(allComp[comp] == type){
+			results.push(comp);
 		}
 	}
-	out.println(eeprom);
-	out.println(component.invoke(eeprom,"get",[]));
-	cont = dec2string(component.invoke(eeprom,"get",[])[0]);
-	var loadEeprom = undefined
-	out.println(cont);
-	eval(cont);
+	return results;
 }
 
+eval = null;
 
-loadEeprom()
+var loadEeprom = function(){
+	var eepromList = getComponentList('eeprom');
+	if(eepromList.length>0){
+		cont = dec2string(computer.invoke(eepromList[0],"get",[])[0]);
+		var loadEeprom = undefined
+		computer.load(cont,"<bios>");
+	}else{
+		computer.error("No EEPROM Found");
+	}
+}
+
+loadEeprom();

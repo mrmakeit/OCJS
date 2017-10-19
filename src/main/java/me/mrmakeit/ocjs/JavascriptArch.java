@@ -3,7 +3,6 @@ package me.mrmakeit.ocjs;
 import li.cil.oc.api.machine.Architecture;
 import li.cil.oc.api.machine.ExecutionResult;
 import li.cil.oc.api.machine.Machine;
-import li.cil.oc.api.machine.Signal;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -11,7 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public class JavascriptArch implements Architecture {
 	private boolean ready=false;
 	private Machine machine;
-	private javascriptAPI vm;
+	private JavascriptAPI vm;
 	
 	public JavascriptArch(Machine machine) {
 		this.machine = machine;
@@ -24,10 +23,9 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public boolean initialize() {
-		vm = new javascriptAPI(machine);
-		vm.addComputer();
-		vm.addOut();
+		vm = new JavascriptAPI(machine);
 		vm.init();
+		vm.addComputer();
 		ready=true;
 		return true;
 	}
@@ -39,27 +37,11 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public void runSynchronized() {
-		
+    vm.runSync();		
 	}
 	@Override
 	public ExecutionResult runThreaded(boolean isSynchronizedReturn) {
-		if (isSynchronizedReturn){
-			return new ExecutionResult.Sleep(0);
-		}else{
-			if(vm.limited){
-				vm.rerun();
-				return new ExecutionResult.Sleep(0);
-			}else{
-				Signal signal = machine.popSignal();
-				if (signal != null){
-					ExecutionResult result = vm.run(signal);
-					machine.update();
-					return result;
-				}else{
-					return new ExecutionResult.Sleep(0);
-				}
-			}
-		}
+    return vm.runThreaded(isSynchronizedReturn);
 	}
 
 	@Override
@@ -77,6 +59,12 @@ public class JavascriptArch implements Architecture {
 	@Override
 	public boolean recomputeMemory(Iterable<ItemStack> arg0) {
 		return true;
+	}
+
+	@Override
+	public void onSignal() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

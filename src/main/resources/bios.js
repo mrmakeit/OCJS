@@ -1,9 +1,8 @@
 var getComponentList = function(type){
-	var allComp = component.list();
+	var allComp = computer.list();
 	var results = []
 	for(comp in allComp){
 		if(allComp[comp] == type){
-			out.println(comp);
 			results.push(comp);
 		}
 	}
@@ -11,21 +10,21 @@ var getComponentList = function(type){
 }
 
 var loadFrom = function(address){
-	out.println(address);
-	var handle = component.invoke(address, 'open', ['/init.js']);
+	var handle = computer.invoke(address, 'open', ['/init.js']);
 	if(!handle){
 		return false;
 	}
 	var buffer = "";
 	var data = "";
 	do{
-		data = component.invoke(address, "read", [handle, Number.MAX_VALUE]);
+		data = computer.invoke(address, "read", [handle, Number.MAX_VALUE]);
 		if(data){
 			buffer = buffer + data
 		}
 	}while(data);
-	component.invoke(address,'close', [handle]);
-	eval(buffer);
+	computer.invoke(address,'close', [handle]);
+	error(buffer);
+	computer.load(buffer,'/init.js');
 }
 
 var setScreens = function(){
@@ -33,7 +32,7 @@ var setScreens = function(){
 	var gpu = getComponentList('gpu')[0];
 	if(screen){
 		if(gpu){
-			component.invoke(gpu, 'bind', [screen]);
+			computer.invoke(gpu, 'bind', [screen]);
 		}
 	}
 }
@@ -42,11 +41,12 @@ var init = function(){
 	setScreens();
 	var drives = getComponentList('filesystem')
 	if(drives.length>0){
-		drives.forEach(function(address){
+		for(drive in drives){
+			address = drives[drive];
 			loadFrom(address);
-		});
+		}
 	}
-	error('No Bootable Medium Found!');
+	error("No Bootable Medium Found");
 }
 
 init();
