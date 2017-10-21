@@ -50,6 +50,7 @@ class ThreadResponse {
   ExecutionResult processResult(){
     next=doNext;
     doNext=null;
+    System.out.println("Processing next loop response");
     if(finalLoop){
       return new ExecutionResult.Shutdown(reboot);
     }

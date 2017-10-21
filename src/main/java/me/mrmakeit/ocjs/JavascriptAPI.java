@@ -51,6 +51,7 @@ public class JavascriptAPI {
   public ExecutionResult runThreaded(boolean syncReturn) {
     Context cx = factory.enterContext();
     if(!initialized){
+      System.out.println("Running Init");
       String eepromAddress = "";
       Map<String, String> components = machine.components();
       System.out.println("Getting EEPROM Address");
@@ -81,9 +82,11 @@ public class JavascriptAPI {
       System.out.println("Ready");
       initialized=true;
     }else{
+      System.out.println("Running Thread");
       if(resp.next!=null){
         resp.next.call(cx,scope,scope,new Object[0]);
       }else{
+	System.out.println("No More Functions");
         Context.exit();
         return new ExecutionResult.Error("No More Functions To Execute");
       }

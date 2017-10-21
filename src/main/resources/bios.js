@@ -1,3 +1,15 @@
+var dec2string = function(arr){
+	string = ""
+	for(var x in arr){
+		string = string + String.fromCharCode(arr[x])
+	}
+	return string
+}
+
+var error = function(text){
+	computer.error(text);
+}
+
 var getComponentList = function(type){
 	var allComp = computer.list();
 	var results = []
@@ -25,15 +37,15 @@ var loadFrom = function(address){
 	var buffer = "";
 	var data = "";
 	do{
-		data = computer.invoke(address, "read", [handle, Number.MAX_VALUE])[0];
+		data = dec2string(computer.invoke(address, "read", [handle, Number.MAX_VALUE])[0]);
 		computer.print(data);
 		if(data){
 			buffer = buffer + data
 		}
 	}while(data);
 	computer.invoke(address,'close', [handle]);
-	computer.error(buffer);
-	computer.load(buffer,'/init.js');
+	eval(buffer);
+	return true;
 }
 
 var setScreens = function(){
@@ -54,7 +66,9 @@ var init = function(){
 	if(drives.length>0){
 		for(drive in drives){
 			address = drives[drive];
-			loadFrom(address);
+			if(loadFrom(address)){
+				return;
+			}
 		}
 	}
 	computer.error("No Bootable Medium Found");
