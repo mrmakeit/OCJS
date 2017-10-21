@@ -8,7 +8,7 @@ import li.cil.oc.api.machine.Machine;
 public abstract class ContinuationResponse {
 
   public static enum ContinuationType {
-    SLEEP, DIRECT, INVOKE, EVAL
+    SLEEP, DIRECT, INVOKE
   }
 
   ContinuationType type;

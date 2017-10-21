@@ -11,6 +11,7 @@ public class JavascriptArch implements Architecture {
 	private boolean ready=false;
 	private Machine machine;
 	private JavascriptAPI vm;
+  private boolean signal=false;
 	
 	public JavascriptArch(Machine machine) {
 		this.machine = machine;
@@ -18,7 +19,7 @@ public class JavascriptArch implements Architecture {
 	
 	@Override
 	public boolean isInitialized() {
-		return ready;
+		return vm.initialized;
 	}
 
 	@Override
@@ -37,7 +38,7 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public void runSynchronized() {
-    vm.runSync();		
+    vm.runSync();
 	}
 	@Override
 	public ExecutionResult runThreaded(boolean isSynchronizedReturn) {
@@ -63,7 +64,6 @@ public class JavascriptArch implements Architecture {
 
 	@Override
 	public void onSignal() {
-		// TODO Auto-generated method stub
 		
 	}
 	
