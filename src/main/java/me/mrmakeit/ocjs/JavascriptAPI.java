@@ -1,6 +1,6 @@
 package me.mrmakeit.ocjs;
 
-import me.mrmakeit.ocjs.CallbackManager.*;
+import java.util.Map;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
@@ -15,8 +15,7 @@ public class JavascriptAPI {
   Machine machine;
   boolean sync;
   ContextFactory factory = new APIContextFactory();
-  EventLoop eventLoop;
-  SignalLoop signalLoop;
+  ThreadResponse resp;  
 
   public boolean initialized = false;
   
@@ -26,36 +25,70 @@ public class JavascriptAPI {
     }catch(Throwable e){
     }
     machine = m;
+    this.resp = new ThreadResponse();
   }
   
   public void init() {
     Context cx = factory.enterContext();
     scope = cx.initSafeStandardObjects();
-    this.eventLoop = new EventLoop(machine,scope);
-    this.signalLoop = new SignalLoop(machine,scope);
     Context.exit();
   }
 
   public void addComputer() {
-    Context cx = factory.enterContext();
-    Object jsComp = Context.javaToJS(new ComputerAPI(machine,scope), scope);
+    factory.enterContext();
+    Object jsComp = Context.javaToJS(new ComputerAPI(machine,scope,resp), scope);
     ScriptableObject.putProperty(scope,"computer",jsComp);
     Context.exit();
   }
 
-  public void runSync(boolean newSignal) {
+  public void runSync() {
     Context cx = factory.enterContext();
-    eventLoop.runCallbacks(cx);
-    signalLoop.runCallbacks(cx);
+    System.out.println("Running Sync");
+    resp.next.call(cx,scope,scope,new Object[0]);
     Context.exit();
   }
 
   public ExecutionResult runThreaded(boolean syncReturn) {
     Context cx = factory.enterContext();
-    ExecutionResult result = null;
-    if(initialized){
+    if(!initialized){
+      String eepromAddress = "";
+      Map<String, String> components = machine.components();
+      System.out.println("Getting EEPROM Address");
+      for( Map.Entry<String,String> entry: components.entrySet()){
+        if(entry.getValue()=="eeprom"){
+          eepromAddress = entry.getKey();
+        }
+      }
+      if(eepromAddress == ""){
+	System.out.println("No EEPROM");
+        Context.exit();
+        return new ExecutionResult.Error("No EEPROM");
+      }
+      System.out.println("Found EEPROM "+eepromAddress);
+      String bios = "";
+      System.out.println("Getting BIOS");
+      try{
+        byte[] biosIn = (byte[])machine.invoke(eepromAddress,"get",new Object[0])[0];
+	bios = new String(biosIn);
+      } catch(Exception e){
+        Context.exit();
+	e.printStackTrace();
+        return new ExecutionResult.Error(e.getMessage());
+      }
+      System.out.println("Got BIOS");
+      System.out.println(bios);
+      cx.evaluateString(scope,bios,"<bios>",1,null);
+      System.out.println("Ready");
+      initialized=true;
+    }else{
+      if(resp.next!=null){
+        resp.next.call(cx,scope,scope,new Object[0]);
+      }else{
+        Context.exit();
+        return new ExecutionResult.Error("No More Functions To Execute");
+      }
     }
     Context.exit();
-    return result;
+    return resp.processResult();
   }
 }

@@ -8,10 +8,8 @@ import net.minecraft.nbt.NBTTagCompound;
 
 @Architecture.Name("JavaScript")
 public class JavascriptArch implements Architecture {
-	private boolean ready=false;
 	private Machine machine;
 	private JavascriptAPI vm;
-  private boolean signal=false;
 	
 	public JavascriptArch(Machine machine) {
 		this.machine = machine;
@@ -19,6 +17,9 @@ public class JavascriptArch implements Architecture {
 	
 	@Override
 	public boolean isInitialized() {
+		if(vm==null){
+			return false;
+		}
 		return vm.initialized;
 	}
 
@@ -27,7 +28,6 @@ public class JavascriptArch implements Architecture {
 		vm = new JavascriptAPI(machine);
 		vm.init();
 		vm.addComputer();
-		ready=true;
 		return true;
 	}
 

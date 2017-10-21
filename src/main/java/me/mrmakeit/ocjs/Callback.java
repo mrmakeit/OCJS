@@ -3,7 +3,6 @@ package me.mrmakeit.ocjs;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
-import li.cil.oc.api.machine.LimitReachedException;
 import li.cil.oc.api.machine.Machine;
 
 import org.mozilla.javascript.Context;

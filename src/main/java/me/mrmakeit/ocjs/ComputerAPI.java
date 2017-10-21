@@ -16,25 +16,19 @@ public class ComputerAPI {
 
   private Machine machine;
   private Scriptable scope;
-  private boolean sync = false;
+  private ThreadResponse resp;
 
-  public ComputerAPI(Machine machine, Scriptable scope) {
+  public ComputerAPI(Machine machine, Scriptable scope, ThreadResponse resp) {
     this.machine = machine;
     this.scope = scope;
-  }
-
-  public void syncOn(){
-    sync = true;
-  }
-
-  public void syncOff(){
-    sync = false;
+    this.resp = resp;
   }
 
   @JSFunction
   public NativeObject list() {
     Map<String, String> components = machine.components();
     NativeObject nobj = new NativeObject();
+    System.out.println("Getting component list");
     for (Map.Entry<String, String> entry : components.entrySet()) {
         nobj.defineProperty(entry.getKey(), entry.getValue(), NativeObject.READONLY);
     }
@@ -44,11 +38,30 @@ public class ComputerAPI {
   @JSFunction
   public void invoke(String address, String method, Object[] params,Function callback){
     Context cx = Context.getCurrentContext();
-    if(sync){
+    System.out.println("Running "+method+" on "+address);
+    if(resp.inSync){
       new InvokeCallback(machine,address,method,params,callback).call(cx,scope,null);
     }else{
-      cx.evaluateString(scope, "throw { error:\"SyncOnly\",message:\"Machine.invoke can only be called inside an event loop or a Machine.direct callback\"}","<Error>",1,null);
+      cx.evaluateString(scope, "throw { error:\"SyncOnly\",message:\"Machine.invoke can only be called inside a Machine.direct callback\"}","<Error>",1,null);
     }
+  }
+
+  @JSFunction
+  public Object[] invoke(String address, String method, Object[] params){
+    Context cx = Context.getCurrentContext();
+    System.out.println("Running "+method+" on "+address+" Directly.");
+    Object[] result = null;
+    if(resp.inSync){
+      try{ 
+        result = machine.invoke(address,method,params);
+      } catch(Exception e){
+	e.printStackTrace();
+        cx.evaluateString(scope, "throw { error:\"InvokeError\",message:\""+e.getMessage()+"\"}","<Error>",1,null);
+      }
+    }else{
+      cx.evaluateString(scope, "throw { error:\"SyncOnly\",message:\"Machine.invoke can only be called inside a Machine.direct callback\"}","<Error>",1,null);
+    }
+    return result;
   }
 
   @JSFunction
@@ -63,6 +76,32 @@ public class ComputerAPI {
   @JSFunction
   public void direct(){
     System.out.println("Direct Function Call");
+    resp.makeSync();
+  }
+
+  @JSFunction
+  public void sleep(int time){
+    resp.sleep(time);
+  }
+
+  @JSFunction
+  public void setDefaultSleep(int time){
+    resp.defaultSleep(time);
+  }
+
+  @JSFunction
+  public void shutdown(boolean reboot){
+    resp.shutdown(reboot);
+  }
+
+  @JSFunction
+  public void next(Function cb){
+    resp.nextFunction(cb);
+  }
+
+  @JSFunction
+  public void print(String message){
+    System.out.println(message);
   }
 
   @JSFunction
