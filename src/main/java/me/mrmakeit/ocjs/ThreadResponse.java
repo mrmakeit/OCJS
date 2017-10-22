@@ -47,6 +47,10 @@ class ThreadResponse {
     inSync = false;
   }
 
+  void processLoop(){
+
+  }
+
   ExecutionResult processResult(){
     next=doNext;
     doNext=null;

@@ -82,14 +82,7 @@ public class JavascriptAPI {
       System.out.println("Ready");
       initialized=true;
     }else{
-      System.out.println("Running Thread");
-      if(resp.next!=null){
-        resp.next.call(cx,scope,scope,new Object[0]);
-      }else{
-	System.out.println("No More Functions");
-        Context.exit();
-        return new ExecutionResult.Error("No More Functions To Execute");
-      }
+      resp.processLoop();
     }
     Context.exit();
     return resp.processResult();
