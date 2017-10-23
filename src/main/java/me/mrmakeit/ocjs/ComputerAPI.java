@@ -59,7 +59,7 @@ public class ComputerAPI {
       try{ 
         result = machine.invoke(address,method,params);
       } catch(Exception e){
-	e.printStackTrace();
+  e.printStackTrace();
         cx.evaluateString(scope, "throw { error:\"InvokeError\",message:\""+e.getMessage()+"\"}","<Error>",1,null);
       }
     }else{

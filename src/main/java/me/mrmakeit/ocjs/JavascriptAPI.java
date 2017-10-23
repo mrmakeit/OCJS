@@ -62,7 +62,7 @@ public class JavascriptAPI {
         }
       }
       if(eepromAddress == ""){
-	System.out.println("No EEPROM");
+  System.out.println("No EEPROM");
         Context.exit();
         return new ExecutionResult.Error("No EEPROM");
       }
@@ -71,10 +71,10 @@ public class JavascriptAPI {
       System.out.println("Getting BIOS");
       try{
         byte[] biosIn = (byte[])machine.invoke(eepromAddress,"get",new Object[0])[0];
-	bios = new String(biosIn);
+  bios = new String(biosIn);
       } catch(Exception e){
         Context.exit();
-	e.printStackTrace();
+  e.printStackTrace();
         return new ExecutionResult.Error(e.getMessage());
       }
       System.out.println("Got BIOS");
