@@ -50,6 +50,7 @@ public class JavascriptAPI {
 
   public ExecutionResult runThreaded(boolean syncReturn) {
     Context cx = factory.enterContext();
+    //TODO: Process machine.invoke callbacks before next event
     if(!initialized){
       System.out.println("Running Init");
       String eepromAddress = "";

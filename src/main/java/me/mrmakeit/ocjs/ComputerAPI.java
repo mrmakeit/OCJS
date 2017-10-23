@@ -35,6 +35,9 @@ public class ComputerAPI {
     return nobj;
   }
 
+  //TODO: Create invoke callback list in JavascriptAPI to handle invokes that failed due to
+  //    | InvokeLimitReached exception. This will allow the function to work in threaded
+  //    | mode as well.
   @JSFunction
   public void invoke(String address, String method, Object[] params,Function callback){
     Context cx = Context.getCurrentContext();
@@ -46,6 +49,7 @@ public class ComputerAPI {
     }
   }
 
+  //TODO: Make this function return success/failure instead of actual result to encourage using above format.
   @JSFunction
   public Object[] invoke(String address, String method, Object[] params){
     Context cx = Context.getCurrentContext();
