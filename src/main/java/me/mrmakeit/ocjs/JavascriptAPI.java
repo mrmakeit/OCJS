@@ -50,7 +50,6 @@ public class JavascriptAPI {
 
   public ExecutionResult runThreaded(boolean syncReturn) {
     Context cx = factory.enterContext();
-    //TODO: Process machine.invoke callbacks before next event
     if(!initialized){
       System.out.println("Running Init");
       String eepromAddress = "";
@@ -72,6 +71,9 @@ public class JavascriptAPI {
       try{
         byte[] biosIn = (byte[])machine.invoke(eepromAddress,"get",new Object[0])[0];
   bios = new String(biosIn);
+      } catch(LimitReachedException e){
+        Context.exit();
+        return new ExecutionResult.Error("Shouldn't run out of invoke requests on the first one.  Report to mod author");
       } catch(Exception e){
         Context.exit();
   e.printStackTrace();
@@ -83,7 +85,8 @@ public class JavascriptAPI {
       System.out.println("Ready");
       initialized=true;
     }else{
-      resp.processLoop();
+      resp.processInvoke(cx,scope);
+      resp.processLoop(cx,scope,machine);
     }
     Context.exit();
     return resp.processResult();

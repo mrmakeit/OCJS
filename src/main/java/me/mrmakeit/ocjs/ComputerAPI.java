@@ -42,28 +42,27 @@ public class ComputerAPI {
   public void invoke(String address, String method, Object[] params,Function callback){
     Context cx = Context.getCurrentContext();
     System.out.println("Running "+method+" on "+address);
-    if(resp.inSync){
-      new InvokeCallback(machine,address,method,params,callback).call(cx,scope,null);
-    }else{
-      cx.evaluateString(scope, "throw { error:\"SyncOnly\",message:\"Machine.invoke can only be called inside a Machine.direct callback\"}","<Error>",1,null);
+    try{ 
+      Object[] result = machine.invoke(address,method,params);
+      callback.call(cx,scope,scope,result);
+    } catch (LimitReachedException e){
+      resp.addInvoke(new InvokeCallback(machine,address,method,params,callback));
+    } catch(Exception e){
+e.printStackTrace();
+      cx.evaluateString(scope, "throw { error:\"InvokeError\",message:\""+e.getMessage()+"\"}","<Error>",1,null);
     }
   }
 
-  //TODO: Make this function return success/failure instead of actual result to encourage using above format.
   @JSFunction
-  public Object[] invoke(String address, String method, Object[] params){
+  public Object[] invokeSync(String address, String method, Object[] params){
     Context cx = Context.getCurrentContext();
-    System.out.println("Running "+method+" on "+address+" Directly.");
+    System.out.println("Running "+method+" on "+address+" Sync.");
     Object[] result = null;
-    if(resp.inSync){
-      try{ 
-        result = machine.invoke(address,method,params);
-      } catch(Exception e){
-  e.printStackTrace();
-        cx.evaluateString(scope, "throw { error:\"InvokeError\",message:\""+e.getMessage()+"\"}","<Error>",1,null);
-      }
-    }else{
-      cx.evaluateString(scope, "throw { error:\"SyncOnly\",message:\"Machine.invoke can only be called inside a Machine.direct callback\"}","<Error>",1,null);
+    try{ 
+      result = machine.invoke(address,method,params);
+    } catch(Exception e){
+e.printStackTrace();
+      cx.evaluateString(scope, "throw { error:\"InvokeError\",message:\""+e.getMessage()+"\"}","<Error>",1,null);
     }
     return result;
   }

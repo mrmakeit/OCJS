@@ -1,8 +1,14 @@
 package me.mrmakeit.ocjs;
 
-import org.mozilla.javascript.Function;
+import java.util.List;
 
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+
+import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.ExecutionResult;
+import me.mrmakeit.ocjs.Callback.InvokeCallback;
 
 class ThreadResponse {
   boolean shutdown = false;
@@ -12,15 +18,19 @@ class ThreadResponse {
   int defaultSleep = 0;
   boolean sleepSet = false;
   Function next;
-  Function doNext;
   boolean inSync = false;
   boolean finalLoop = false;
+  List<InvokeCallback> invokeList;
 
   void shutdown(boolean andReboot){
     if(!shutdown){
       shutdown = true;
       reboot = andReboot;
     }
+  }
+
+  void addInvoke(InvokeCallback cb){
+    invokeList.add(cb);
   }
 
   void sleep(int time){
@@ -35,7 +45,7 @@ class ThreadResponse {
   
   void nextFunction(Function next){
     System.out.println("Next function appended");
-    this.doNext = next;
+    this.next = next;
   }
 
   void makeSync(){
@@ -47,14 +57,27 @@ class ThreadResponse {
     inSync = false;
   }
 
-  void processLoop(){
-    //TODO: Process the event loop here.
+  void processLoop(Context cx, Scriptable scope, Machine machine){
+    if(next==null){
+      machine.crash("No Event Loop Function!");
+      return;
+    }
+    next.call(cx,scope,scope,null);
+  }
 
+  void processInvoke(Context cx,Scriptable scope){
+    //TODO: limit size based on cpu tier;
+    if(invokeList.size()<=0){
+      return;
+    }
+    int size = Math.min(invokeList.size(),10);
+    for (int i = 0; i < size; i++){
+      invokeList.get(i).call(cx,scope,null);
+    }
+    invokeList.subList(0,size).clear();
   }
 
   ExecutionResult processResult(){
-    next=doNext;
-    doNext=null;
     System.out.println("Processing next loop response");
     if(finalLoop){
       return new ExecutionResult.Shutdown(reboot);
