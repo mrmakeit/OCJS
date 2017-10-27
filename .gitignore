@@ -20,3 +20,8 @@ build
 # other
 eclipse
 run
+
+workbench.xmi
+
+.*.swp
+

@@ -1,22 +1,13 @@
 package me.mrmakeit.ocjs;
 
-import me.mrmakeit.ocjs.ContinuationResponse;
-import me.mrmakeit.ocjs.ContinuationResponse.*;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.Map;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.Script; import org.mozilla.javascript.ContinuationPending;
-import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.annotations.*;
 
 import li.cil.oc.api.machine.*;
 
@@ -24,8 +15,9 @@ public class JavascriptAPI {
 
   Scriptable scope;
   Machine machine;
+  boolean sync;
   ContextFactory factory = new APIContextFactory();
-  ContinuationPending pending;
+  ThreadResponse resp;  
 
   public boolean initialized = false;
   
@@ -35,6 +27,7 @@ public class JavascriptAPI {
     }catch(Throwable e){
     }
     machine = m;
+    this.resp = new ThreadResponse();
   }
   
   public void init() {
@@ -44,132 +37,92 @@ public class JavascriptAPI {
   }
 
   public void addComputer() {
-    Context cx = factory.enterContext();
-    Object jsComp = Context.javaToJS(new ComputerAPI(machine), scope);
+    factory.enterContext();
+    Object jsComp = Context.javaToJS(new ComputerAPI(machine,scope,resp), scope);
     ScriptableObject.putProperty(scope,"computer",jsComp);
-    Function eval = cx.compileFunction(scope,"function eval(a){error('No, Dont Eval!')}","eval",1,null);
-    ScriptableObject.putProperty(scope,"eval",eval);
     Context.exit();
   }
 
   public void runSync() {
-    ContinuationPending c = pending;
-    ManageSyncPending(c);
+    Context cx = factory.enterContext();
+    System.out.println("Running Sync");
+    try{
+      resp.next.call(cx,scope,scope,new Object[0]);
+    } catch(JavaScriptException e){
+      Context.exit();
+      e.printStackTrace();
+      machine.crash((String)e.getValue());
+      return;
+    } catch(EvaluatorException e){
+      Context.exit();
+      e.printStackTrace();
+      machine.crash((String)e.getMessage());
+      return;
+    }
     Context.exit();
   }
 
-  public void ManageSyncPending(ContinuationPending c){
-    Context cx = factory.enterContext();
-    ContinuationResponse resp = (ContinuationResponse)c.getApplicationState();
-    switch(resp.type) {
-      case DIRECT:
-        resp.resume(cx,scope,pending.getContinuation());
-        break;
-      case INVOKE:
-        resp.resume(cx,scope,pending.getContinuation());
-        break;
-      case SLEEP:
-        break;
-      case EVAL:
-        System.out.println("Running Sync Eval");
-        try{
-          ((EvalResponse)resp).executeScript(cx,scope);
-        } catch(ContinuationPending d){
-          ManageSyncPending(d);
-        } catch(Exception e){
-          System.out.println("Oops? ");
-          e.printStackTrace();
-	  machine.crash(e.getMessage());
-	  return;
-        }finally{
-          try{
-            cx.resumeContinuation(c.getContinuation(),scope,null);
-          } catch(ContinuationPending d){
-            ManageSyncPending(d);
-          } catch(Exception e){
-            System.out.println("Oops? ");
-            e.printStackTrace();
-	    machine.crash(e.getMessage());
-          }
-        }
-    }
-  }
-  public ExecutionResult ManagePending(ContinuationPending c){
-    ExecutionResult result = null;
-    ContinuationResponse resp = (ContinuationResponse)c.getApplicationState();
-    switch(resp.type) {
-      case DIRECT:
-        result = new ExecutionResult.SynchronizedCall();
-        machine.update();
-        break;
-      case INVOKE:
-        result = new ExecutionResult.SynchronizedCall();
-        machine.update();
-        break;
-      case SLEEP:
-        int time = ((SleepResponse)resp).time;
-        result = new ExecutionResult.Sleep(time);
-        machine.update();
-        break;
-      case EVAL:
-        System.out.println("Running Eval");
-        Context cx = Context.getCurrentContext();
-        try{
-          ((EvalResponse)resp).executeScript(cx,scope);
-        } catch(ContinuationPending d){
-          result = ManagePending(d);
-        } catch(Exception e){
-          System.out.println("Oops? ");
-          e.printStackTrace();
-	  machine.crash(e.getMessage());
-	  return new ExecutionResult.Error(e.getMessage());
-        }finally{
-          try{
-            cx.resumeContinuation(c.getContinuation(),scope,null);
-          } catch(ContinuationPending d){
-            result = ManagePending(d);
-          } catch(Exception e){
-            System.out.println("Oops? ");
-            e.printStackTrace();
-	    machine.crash(e.getMessage());
-          }
-        }
-    }
-    return result;
-  }
   public ExecutionResult runThreaded(boolean syncReturn) {
     Context cx = factory.enterContext();
-    ExecutionResult result = null;
-    //First Run
-    if(initialized!=true) {
-      InputStream stream = JavascriptAPI.class.getClassLoader().getResourceAsStream("boot.js");
-      Reader read = new InputStreamReader(stream);
-      try {
-        Script script = cx.compileReader(read, "<kernel>", 1, null);
-        cx.executeScriptWithContinuations(script,scope);
-      }catch (IOException e) {
-        System.out.println("Couldn't Find Boot.js in resources.  Can't start computer!");
-        result = new ExecutionResult.Error("No Boot.js in mod resource.  Please notify the mod author");
-      }catch (ContinuationPending c) {
-        pending = c;
-        result = ManagePending(c);
-        initialized=true;
+    if(!initialized){
+      System.out.println("Running Init");
+      String eepromAddress = "";
+      Map<String, String> components = machine.components();
+      System.out.println("Getting EEPROM Address");
+      for( Map.Entry<String,String> entry: components.entrySet()){
+        System.out.println(entry.getValue());
+        System.out.println(entry.getKey());
+        if("eeprom".equals(entry.getValue())){
+          eepromAddress = entry.getKey();
+        }
       }
-    }else{      
-      ContinuationResponse response = (ContinuationResponse)pending.getApplicationState();
-      try {
-        response.resume(cx,scope,pending.getContinuation());
-      }catch (ContinuationPending c) {
-        result = ManagePending(c);
+      if(eepromAddress.isEmpty()){
+        System.out.println("No EEPROM");
+        Context.exit();
+        return new ExecutionResult.Error("No EEPROM");
       }
-    }
-
-    //No Continuation was created.  This means the script closed, which means the system did not shutdown correctly
-    if(result==null) {
-      result = new ExecutionResult.Error("Kernel Unexpectedly quit.");
+      System.out.println("Found EEPROM "+eepromAddress);
+      String bios = "";
+      System.out.println("Getting BIOS");
+      try{
+        byte[] biosIn = (byte[])machine.invoke(eepromAddress,"get",new Object[0])[0];
+        bios = new String(biosIn);
+      } catch(LimitReachedException e){
+        Context.exit();
+        return new ExecutionResult.Error("Shouldn't run out of invoke requests on the first one.  Report to mod author");
+      } catch(Exception e){
+        Context.exit();
+        e.printStackTrace();
+        return new ExecutionResult.Error(e.getMessage());
+      }
+      System.out.println("Got BIOS");
+      System.out.println(bios);
+      try{
+        cx.evaluateString(scope,bios,"<bios>",1,null);
+      } catch(JavaScriptException e){
+        e.printStackTrace();
+        return new ExecutionResult.Error((String)e.getValue());
+      } catch(EvaluatorException e){
+        e.printStackTrace();
+        return new ExecutionResult.Error((String)e.getMessage());
+      }
+      System.out.println("Ready");
+      initialized=true;
+    }else{
+      try{
+        resp.processInvoke(cx,scope);
+        resp.processLoop(cx,scope,machine);
+      } catch(JavaScriptException e){
+        Context.exit();
+        e.printStackTrace();
+        return new ExecutionResult.Error(e.getMessage());
+      } catch(Exception e){
+        Context.exit();
+        e.printStackTrace();
+        return new ExecutionResult.Error(e.getMessage());
+      }
     }
     Context.exit();
-    return result;
+    return resp.processResult();
   }
-      
 }
