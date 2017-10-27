@@ -1,6 +1,7 @@
 var dec2string = function(arr){
 	string = ""
 	for(var x in arr){
+    computer.print(arr[x]);
 		string = string + String.fromCharCode(arr[x])
 	}
 	return string
@@ -24,7 +25,27 @@ var getComponentList = function(type){
 	return results;
 }
 
-var loadFrom = function(address){
+var loadFrom = function(address, success){
+  computer.invoke(address, 'open', ['/init.js'],function(handle){
+    if(!handle){
+      return;
+    }
+    var buffer = "";
+    var readData = function(results){ 
+      if(results){
+        var data = dec2string(results);
+        buffer = buffer + data;
+        computer.invoke(address,"read",[handle, Number.MAX_VALUE],readData,function(error){});
+      }else{
+        computer.invoke(address,'close', [handle], function(){
+          computer.print(buffer);
+          success();
+          eval(buffer); 
+        }, function(){});
+      }
+    }
+    computer.invoke(address,"read",[handle, Number.MAX_VALUE],readData,function(error){});
+  },function(error){});
 }
 
 var setScreens = function(){
@@ -33,25 +54,33 @@ var setScreens = function(){
 	var gpu = getComponentList('gpu')[0];
 	if(screen){
 		if(gpu){
-			computer.invoke(gpu, 'bind', [screen], function(){});
+			computer.invokeSync(gpu, 'bind', [screen]);
 		}
 	}
 }
 
 var init = function(){
+  if(!runOne){
+    if(ready){
+    }else{
+      computer.error("No Bootable Medium Found");
+    }
+  }
+  runOne = false;
 	computer.print("Running BIOS Init");
 	setScreens();
 	var drives = getComponentList('filesystem')
 	if(drives.length>0){
 		for(drive in drives){
 			address = drives[drive];
-			if(loadFrom(address)){
-				return;
-			}
+			loadFrom(address,function(){
+        ready = true;
+      })
 		}
 	}
-	computer.error("No Bootable Medium Found");
 }
 
+var runOne = true;
+var ready = false;
 computer.next(init);
 computer.direct();

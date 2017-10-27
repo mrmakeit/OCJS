@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -44,7 +46,19 @@ public class JavascriptAPI {
   public void runSync() {
     Context cx = factory.enterContext();
     System.out.println("Running Sync");
-    resp.next.call(cx,scope,scope,new Object[0]);
+    try{
+      resp.next.call(cx,scope,scope,new Object[0]);
+    } catch(JavaScriptException e){
+      Context.exit();
+      e.printStackTrace();
+      machine.crash((String)e.getValue());
+      return;
+    } catch(EvaluatorException e){
+      Context.exit();
+      e.printStackTrace();
+      machine.crash((String)e.getMessage());
+      return;
+    }
     Context.exit();
   }
 
@@ -58,11 +72,11 @@ public class JavascriptAPI {
       for( Map.Entry<String,String> entry: components.entrySet()){
         System.out.println(entry.getValue());
         System.out.println(entry.getKey());
-        if(entry.getValue()=="eeprom"){
+        if("eeprom".equals(entry.getValue())){
           eepromAddress = entry.getKey();
         }
       }
-      if(eepromAddress == ""){
+      if(eepromAddress.isEmpty()){
         System.out.println("No EEPROM");
         Context.exit();
         return new ExecutionResult.Error("No EEPROM");
@@ -83,12 +97,30 @@ public class JavascriptAPI {
       }
       System.out.println("Got BIOS");
       System.out.println(bios);
-      cx.evaluateString(scope,bios,"<bios>",1,null);
+      try{
+        cx.evaluateString(scope,bios,"<bios>",1,null);
+      } catch(JavaScriptException e){
+        e.printStackTrace();
+        return new ExecutionResult.Error((String)e.getValue());
+      } catch(EvaluatorException e){
+        e.printStackTrace();
+        return new ExecutionResult.Error((String)e.getMessage());
+      }
       System.out.println("Ready");
       initialized=true;
     }else{
-      resp.processInvoke(cx,scope);
-      resp.processLoop(cx,scope,machine);
+      try{
+        resp.processInvoke(cx,scope);
+        resp.processLoop(cx,scope,machine);
+      } catch(JavaScriptException e){
+        Context.exit();
+        e.printStackTrace();
+        return new ExecutionResult.Error(e.getMessage());
+      } catch(Exception e){
+        Context.exit();
+        e.printStackTrace();
+        return new ExecutionResult.Error(e.getMessage());
+      }
     }
     Context.exit();
     return resp.processResult();

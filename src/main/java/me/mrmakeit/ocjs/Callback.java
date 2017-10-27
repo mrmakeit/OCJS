@@ -20,16 +20,18 @@ class Callback {
     private String address;
     private String method;
     private Object[] params; 
-    InvokeCallback(Machine machine, String address, String method, Object[] params, Function cb) {
+    private Function error;
+    InvokeCallback(Machine machine, String address, String method, Object[] params, Function cb, Function error) {
       super(cb);
       this.address = address;
       this.method = method;
       this.params = params;
+      this.error = error;
     }
     @Override
     public void call(Context cx, Scriptable scope, Object[] params){
       Function invoke = (Function)scope.get("machine.invoke",scope);
-      invoke.call(cx,scope,scope,new Object[] {address,method,this.params,cb});
+      invoke.call(cx,scope,scope,new Object[] {address,method,this.params,cb,error});
     }
   }
 }

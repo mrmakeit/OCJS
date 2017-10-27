@@ -64,7 +64,7 @@ class ThreadResponse {
       machine.crash("No Event Loop Function!");
       return;
     }
-    next.call(cx,scope,scope,null);
+    next.call(cx,scope,scope,new Object[]{});
   }
 
   void processInvoke(Context cx,Scriptable scope){

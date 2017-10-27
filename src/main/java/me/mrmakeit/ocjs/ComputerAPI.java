@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.annotations.*;
@@ -39,17 +40,20 @@ public class ComputerAPI {
   //    | InvokeLimitReached exception. This will allow the function to work in threaded
   //    | mode as well.
   @JSFunction
-  public void invoke(String address, String method, Object[] params,Function callback){
+  public void invoke(String address, String method, Object[] params,Function callback, Function error){
     Context cx = Context.getCurrentContext();
     System.out.println("Running "+method+" on "+address);
     try{ 
       Object[] result = machine.invoke(address,method,params);
+      if(result==null){
+        result = new Object[]{};
+      }
       callback.call(cx,scope,scope,result);
     } catch (LimitReachedException e){
-      resp.addInvoke(new InvokeCallback(machine,address,method,params,callback));
+      resp.addInvoke(new InvokeCallback(machine,address,method,params,callback,error));
     } catch(Exception e){
       e.printStackTrace();
-      cx.evaluateString(scope, "throw { error:\"InvokeError\",message:\""+e.getMessage()+"\"}","<Error>",1,null);
+      error.call(cx,scope,scope,new Object[]{e.getMessage()});
     }
   }
 
@@ -64,7 +68,7 @@ public class ComputerAPI {
       result = new Object[] {"Error","Too many invoke calls.  Use async to avoid this"};
     } catch(Exception e){
       e.printStackTrace();
-      cx.evaluateString(scope, "throw { error:\"InvokeError\",message:\""+e.getMessage()+"\"}","<Error>",1,null);
+      throw new JavaScriptException(e.getMessage(), "invoke", 0);
     }
     return result;
   }
