@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.event.*;
 public class OCJS
 {
   public static final String MODID = "ocjs";
-  public static final String VERSION = "0.4.0";
+  public static final String VERSION = "0.5.0";
   static final String rhino = "transport=socket,suspend=n,address=9000";
   Class<?> clazz;
   public static Object debugger;

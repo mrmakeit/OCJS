@@ -22,3 +22,6 @@ eclipse
 run
 
 workbench.xmi
+
+.*.swp
+
