@@ -25,27 +25,6 @@ var getComponentList = function(type){
 }
 
 var loadFrom = function(address){
-	try{
-		var handle = computer.invoke(address, 'open', ['/init.js'])[0];
-	}catch(e){
-		return false;
-	}
-	if(!handle){
-		return false;
-	}
-	computer.print(handle);
-	var buffer = "";
-	var data = "";
-	do{
-		data = dec2string(computer.invoke(address, "read", [handle, Number.MAX_VALUE])[0]);
-		computer.print(data);
-		if(data){
-			buffer = buffer + data
-		}
-	}while(data);
-	computer.invoke(address,'close', [handle]);
-	eval(buffer);
-	return true;
 }
 
 var setScreens = function(){
@@ -54,7 +33,7 @@ var setScreens = function(){
 	var gpu = getComponentList('gpu')[0];
 	if(screen){
 		if(gpu){
-			computer.invoke(gpu, 'bind', [screen]);
+			computer.invoke(gpu, 'bind', [screen], function(){});
 		}
 	}
 }

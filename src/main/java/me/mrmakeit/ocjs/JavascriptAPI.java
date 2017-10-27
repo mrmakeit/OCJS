@@ -56,12 +56,14 @@ public class JavascriptAPI {
       Map<String, String> components = machine.components();
       System.out.println("Getting EEPROM Address");
       for( Map.Entry<String,String> entry: components.entrySet()){
+        System.out.println(entry.getValue());
+        System.out.println(entry.getKey());
         if(entry.getValue()=="eeprom"){
           eepromAddress = entry.getKey();
         }
       }
       if(eepromAddress == ""){
-  System.out.println("No EEPROM");
+        System.out.println("No EEPROM");
         Context.exit();
         return new ExecutionResult.Error("No EEPROM");
       }
@@ -70,13 +72,13 @@ public class JavascriptAPI {
       System.out.println("Getting BIOS");
       try{
         byte[] biosIn = (byte[])machine.invoke(eepromAddress,"get",new Object[0])[0];
-  bios = new String(biosIn);
+        bios = new String(biosIn);
       } catch(LimitReachedException e){
         Context.exit();
         return new ExecutionResult.Error("Shouldn't run out of invoke requests on the first one.  Report to mod author");
       } catch(Exception e){
         Context.exit();
-  e.printStackTrace();
+        e.printStackTrace();
         return new ExecutionResult.Error(e.getMessage());
       }
       System.out.println("Got BIOS");

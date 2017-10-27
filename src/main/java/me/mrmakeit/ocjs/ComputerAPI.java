@@ -48,7 +48,7 @@ public class ComputerAPI {
     } catch (LimitReachedException e){
       resp.addInvoke(new InvokeCallback(machine,address,method,params,callback));
     } catch(Exception e){
-e.printStackTrace();
+      e.printStackTrace();
       cx.evaluateString(scope, "throw { error:\"InvokeError\",message:\""+e.getMessage()+"\"}","<Error>",1,null);
     }
   }
@@ -60,8 +60,10 @@ e.printStackTrace();
     Object[] result = null;
     try{ 
       result = machine.invoke(address,method,params);
+    } catch(LimitReachedException e){
+      result = new Object[] {"Error","Too many invoke calls.  Use async to avoid this"};
     } catch(Exception e){
-e.printStackTrace();
+      e.printStackTrace();
       cx.evaluateString(scope, "throw { error:\"InvokeError\",message:\""+e.getMessage()+"\"}","<Error>",1,null);
     }
     return result;

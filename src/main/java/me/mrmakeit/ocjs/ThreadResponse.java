@@ -1,5 +1,6 @@
 package me.mrmakeit.ocjs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.mozilla.javascript.Function;
@@ -8,6 +9,7 @@ import org.mozilla.javascript.Scriptable;
 
 import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.ExecutionResult;
+
 import me.mrmakeit.ocjs.Callback.InvokeCallback;
 
 class ThreadResponse {
@@ -20,7 +22,7 @@ class ThreadResponse {
   Function next;
   boolean inSync = false;
   boolean finalLoop = false;
-  List<InvokeCallback> invokeList;
+  List<InvokeCallback> invokeList = new ArrayList<InvokeCallback>();
 
   void shutdown(boolean andReboot){
     if(!shutdown){
