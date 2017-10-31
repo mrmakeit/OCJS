@@ -15,6 +15,6 @@ If you need javascript debugging, add org.eclipse.wst.jsdt.debug.* files from Ec
 
 `./gradlew runClient`
 
-# Support
+## Support
 
 You can help support deveopment by submitting issues/PRs or through my Patreon at https://patreon.com/mrmakeit
