@@ -34,5 +34,5 @@ jobs:
       - run: gradle build
 
       - store_artifacts:
-        path: ~/repo/build/libs/ocjs*.jar
-        destination: jars
+          path: ~/repo/build/libs/ocjs*.jar
+          destination: jars
