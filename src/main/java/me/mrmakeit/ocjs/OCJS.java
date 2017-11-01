@@ -4,9 +4,9 @@ import java.io.IOException;
 import com.google.common.io.ByteStreams;
 
 import li.cil.oc.api.Items;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.event.*;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.event.*;
 
 @Mod(modid = OCJS.MODID, version = OCJS.VERSION)
 public class OCJS
