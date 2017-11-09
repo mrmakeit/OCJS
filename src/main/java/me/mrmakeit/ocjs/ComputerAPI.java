@@ -76,6 +76,9 @@ public class ComputerAPI {
   @JSFunction
   public NativeObject pullSignal(){
     Signal signal = machine.popSignal();
+    if(signal==null){
+      return null;
+    }
     NativeObject nobj = new NativeObject();
     nobj.defineProperty("name",signal.name(),NativeObject.READONLY);
     nobj.defineProperty("args",signal.args(),NativeObject.READONLY);
