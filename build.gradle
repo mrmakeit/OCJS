@@ -54,7 +54,7 @@ dependencies {
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
     embed 'org.mozilla:rhino:1.7.7.2'
-    compile "li.cil.oc:OpenComputers:MC1.10.2-1.7.+:api"
+    compile "li.cil.oc:OpenComputers:MC1.7.10-1.7.+:api"
     compile files('libs/*');
       
     // real examples
