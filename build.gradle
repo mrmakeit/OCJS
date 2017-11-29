@@ -19,6 +19,11 @@ compileJava {
     sourceCompatibility = targetCompatibility = "1.6"
 }
 
+configurations {
+    embed
+    compile.extendsFrom(embed)
+}
+
 minecraft {
     version = "1.10.2-12.18.3.2185"
     runDir = "run"
@@ -42,8 +47,8 @@ dependencies {
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
+    embed 'org.mozilla:rhino:1.7.7.2'
     compile "li.cil.oc:OpenComputers:MC1.10.2-1.7.+:api"
-    compile group: 'org.mozilla', name: 'rhino', version: '1.7.7.2'
     compile files('libs/*');
       
     // real examples
@@ -62,6 +67,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+}
+
+jar {
+    from configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
 processResources
