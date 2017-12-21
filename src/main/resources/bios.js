@@ -1,4 +1,4 @@
-var printToConsole = false;
+var printToConsole = true;
 var dec2string = function (arr) {
     string = "";
     for (var x in arr) {
