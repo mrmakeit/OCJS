@@ -1,5 +1,7 @@
 package me.mrmakeit.ocjs;
 
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+
 import li.cil.oc.api.machine.LimitReachedException;
 import li.cil.oc.api.machine.Machine;
 
@@ -8,10 +10,10 @@ class InvokeCallback {
   private String method;
   private Object[] params; 
   private Machine machine;
-  private InvokeSuccessCallback cb;
-  private InvokeErrorCallback error;
+  private ScriptObjectMirror cb;
+  private ScriptObjectMirror error;
 
-  InvokeCallback(Machine machine, String address, String method, Object[] params, InvokeSuccessCallback cb, InvokeErrorCallback error) {
+  InvokeCallback(Machine machine, String address, String method, Object[] params, ScriptObjectMirror cb, ScriptObjectMirror error) {
     this.machine = machine;
     this.method = method;
     this.address = address;
@@ -23,11 +25,11 @@ class InvokeCallback {
   public void call(NashornAPI vm){
     try{
       Object[] results = machine.invoke(address,method,params);
-      cb.call(results);
+      cb.call(null,results);
     }catch(LimitReachedException e){
       vm.addInvoke(this);
     }catch(Exception e){
-      error.call(e.getMessage());
+      error.call(null,e.getMessage());
     }
   }
 }

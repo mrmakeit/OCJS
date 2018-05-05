@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 import delight.nashornsandbox.*;
 
-import jdk.nashorn.api.scripting.JSObject;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import li.cil.oc.api.machine.*; 
 public class NashornAPI {
@@ -23,7 +23,7 @@ public class NashornAPI {
   public NashornAPI(Machine m) {
     machine = m;
     sandbox = NashornSandboxes.create();
-    //sandbox.setMaxCPUTime(200);
+    sandbox.setMaxCPUTime(100);
     sandbox.setExecutor(Executors.newSingleThreadExecutor());
     sandbox.inject("computer", new ComputerAPI(machine,this));
   }
@@ -86,8 +86,18 @@ public class NashornAPI {
       }
       Signal next = machine.popSignal();
       if(next != null){
-        JSObject onSignal = (JSObject)sandbox.get("computer.onSignal");
-        onSignal.call(null,next.name(),next.args());
+        Object[] resp = new Object[next.args().length+1];
+        resp[0] = next.name();
+        Object[] args = next.args();
+        for(int i = 0; i < args.length; i = i+1) {
+          resp[i+1] = args[i];
+        }
+        ScriptObjectMirror onSignal = (ScriptObjectMirror)sandbox.get("onSignal");
+        if(onSignal!=null){
+          onSignal.call(null,resp);
+        }else{
+          machine.crash("No event loop.");
+        }
       }
     }
     switch(state){

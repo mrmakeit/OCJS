@@ -23,19 +23,19 @@ public class ComputerAPI {
     return components;
   }
 
-  public void invoke(String address, String method, Object[] params,InvokeSuccessCallback callback, InvokeErrorCallback error){
+  public void invoke(String address, String method, Object[] params,ScriptObjectMirror callback, ScriptObjectMirror error){
     System.out.println("Running "+method+" on "+address);
     try{ 
       Object[] result = machine.invoke(address,method,params);
       if(result==null){
         result = new Object[]{};
       }
-      callback.call(result);
+      callback.call(null,result);
     } catch (LimitReachedException e){
       vm.addInvoke(new InvokeCallback(machine,address,method,params,callback,error));
     } catch(Exception e){
       e.printStackTrace();
-      error.call(e.getMessage());
+      error.call(null,e.getMessage());
     }
   }
 
@@ -44,9 +44,13 @@ public class ComputerAPI {
     if(signal==null){
       return null;
     }
-    Map<String,Object[]> nobj = new HashMap<String,Object[]>();
-    nobj.put(signal.name(),signal.args());
-    return nobj;
+    Object[] resp = new Object[signal.args().length+1];
+    resp[0] = signal.name();
+    Object[] args = signal.args();
+    for(int i = 0; i < args.length; i = i+1) {
+      resp[i+1] = args[i];
+    }
+    return resp;
   }
 
   public void shutdown(boolean reboot){
