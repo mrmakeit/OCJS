@@ -7,11 +7,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 @Architecture.Name("JavaScript")
-public class JavascriptArch implements Architecture {
+public class NashornArch implements Architecture {
   private Machine machine;
-  private JavascriptAPI vm;
+  private NashornAPI vm;
   
-  public JavascriptArch(Machine machine) {
+  public NashornArch(Machine machine) {
     this.machine = machine;
   }
   
@@ -25,9 +25,7 @@ public class JavascriptArch implements Architecture {
 
   @Override
   public boolean initialize() {
-    vm = new JavascriptAPI(machine);
-    vm.init();
-    vm.addComputer();
+    vm = new NashornAPI(machine);
     return true;
   }
 

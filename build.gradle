@@ -48,6 +48,7 @@ dependencies {
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
     embed 'org.mozilla:rhino:1.7.7.2'
+    embed 'org.javadelight:delight-nashorn-sandbox:0.1.13'
     compile "li.cil.oc:OpenComputers:MC1.10.2-1.7.+:api"
     compile files('libs/*');
       
