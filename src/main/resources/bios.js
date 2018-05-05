@@ -37,15 +37,16 @@ var loadFrom = function(address, success){
         buffer = buffer + data;
         computer.invoke(address,"read",[handle, Number.MAX_VALUE],readData,function(error){});
       }else{
-        computer.invoke(address,'close', [handle], function(){
+        computer.invoke(address,'close', [handle], function(_){
           computer.print(buffer);
           success();
           eval(buffer); 
-        }, function(){});
+        }, function(_){});
       }
     }
     computer.invoke(address,"read",[handle, Number.MAX_VALUE],readData,function(error){});
-  },function(error){});
+  },function(error){
+  });
 }
 
 var setScreens = function(){
@@ -54,7 +55,7 @@ var setScreens = function(){
 	var gpu = getComponentList('gpu')[0];
 	if(screen){
 		if(gpu){
-			computer.invokeSync(gpu, 'bind', [screen]);
+      computer.invoke(gpu, 'bind', [screen],function(_){},function(_){});
 		}
 	}
 }
@@ -78,9 +79,11 @@ var init = function(){
       })
 		}
 	}
+  if(!ready){
+    computer.error("Couldn't find /init.js on any bootable drives.")
+  }
 }
 
 var runOne = true;
 var ready = false;
-computer.next(init);
-computer.direct();
+init();

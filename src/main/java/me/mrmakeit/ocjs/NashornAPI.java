@@ -1,8 +1,13 @@
 package me.mrmakeit.ocjs;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import delight.nashornsandbox.*;
+
+import jdk.nashorn.api.scripting.JSObject;
 
 import li.cil.oc.api.machine.*; 
 public class NashornAPI {
@@ -18,7 +23,7 @@ public class NashornAPI {
   public NashornAPI(Machine m) {
     machine = m;
     sandbox = NashornSandboxes.create();
-    sandbox.setMaxCpuTime(200);
+    //sandbox.setMaxCPUTime(200);
     sandbox.setExecutor(Executors.newSingleThreadExecutor());
     sandbox.inject("computer", new ComputerAPI(machine,this));
   }
@@ -64,10 +69,8 @@ public class NashornAPI {
         bios = new String(biosIn);
         sandbox.eval(bios);
       } catch(LimitReachedException e){
-        Context.exit();
         return new ExecutionResult.Error("Shouldn't run out of invoke requests on the first one.  Report to mod author");
       } catch(Exception e){
-        Context.exit();
         e.printStackTrace();
         return new ExecutionResult.Error(e.getMessage());
       }
@@ -77,27 +80,25 @@ public class NashornAPI {
       if(invokeList.size()>0){
         int size = Math.min(invokeList.size(),10);
         for (int i = 0; i < size; i++){
-          invokeList.get(i).call(sandbox);
+          invokeList.get(i).call(this);
         }
         invokeList.subList(0,size).clear();
       }
       Signal next = machine.popSignal();
       if(next != null){
-        JSObject onSignal = sandbox.get("computer.onSignal");
+        JSObject onSignal = (JSObject)sandbox.get("computer.onSignal");
         onSignal.call(null,next.name(),next.args());
       }
     }
     switch(state){
-      case State.SHUTDOWN: return new ExecutionResult.Shutdown(reboot);
-                           break;
-      case State.SLEEP: return new ExecutionResult.Sleep(100);
-                        break;
-      case State.INVOKE: return new ExecutionResult.Sleep(0);
-                         break;
+      case SHUTDOWN: return new ExecutionResult.Shutdown(reboot);
+      case SLEEP: return new ExecutionResult.Sleep(100);
+      case INVOKE: return new ExecutionResult.Sleep(0);
+      default: return new ExecutionResult.Sleep(100);
     }
   }
 }
 
-public enum State {
+enum State {
   SHUTDOWN,SLEEP,INVOKE
 }
