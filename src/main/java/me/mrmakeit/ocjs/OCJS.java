@@ -30,6 +30,7 @@ public class OCJS
     }
 
     li.cil.oc.api.Machine.add(NashornArch.class);
+    li.cil.oc.api.Machine.add(NashornBabelArch.class);
 
     try {
       byte[] code = ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("bios.js"));

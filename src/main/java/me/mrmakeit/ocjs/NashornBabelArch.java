@@ -3,16 +3,15 @@ package me.mrmakeit.ocjs;
 import li.cil.oc.api.machine.Architecture;
 import li.cil.oc.api.machine.ExecutionResult;
 import li.cil.oc.api.machine.Machine;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-@Architecture.Name("Nashorn:ES5")
-public class NashornArch implements Architecture {
+@Architecture.Name("Nashorn:ES6")
+public class NashornBabelArch implements Architecture {
   private Machine machine;
   private NashornAPI vm;
   
-  public NashornArch(Machine machine) {
+  public NashornBabelArch(Machine machine) {
     this.machine = machine;
   }
   
@@ -26,7 +25,7 @@ public class NashornArch implements Architecture {
 
   @Override
   public boolean initialize() {
-    vm = new NashornAPI(machine,false);
+    vm = new NashornAPI(machine,true);
     return true;
   }
 

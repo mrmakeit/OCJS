@@ -1,6 +1,5 @@
 package me.mrmakeit.ocjs;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import jdk.nashorn.api.scripting.*;

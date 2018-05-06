@@ -1,31 +1,59 @@
 package me.mrmakeit.ocjs;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
+import javax.script.*;
+
+import com.google.common.io.ByteStreams;
+
 import delight.nashornsandbox.*;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import jdk.nashorn.api.scripting.*;
 
 import li.cil.oc.api.machine.*; 
 public class NashornAPI {
 
   Machine machine;
   NashornSandbox sandbox;
+  JSObject babel;
+  ScriptEngine babelEngine;
   State state;
+  LoaderAPI loader;
+  boolean runBabel;
   boolean reboot = false;
   List<InvokeCallback> invokeList = new ArrayList<InvokeCallback>();
 
   public boolean initialized = false;
   
-  public NashornAPI(Machine m) {
+  public NashornAPI(Machine m,boolean enableBabel) {
+    babelEngine = new ScriptEngineManager().getEngineByName("nashorn");
+    this.runBabel = enableBabel;
     machine = m;
     sandbox = NashornSandboxes.create();
-    sandbox.setMaxCPUTime(100);
+    sandbox.setMaxCPUTime(200);
     sandbox.setExecutor(Executors.newSingleThreadExecutor());
     sandbox.inject("computer", new ComputerAPI(machine,this));
+    if(enableBabel){
+      try{
+        String coreCode = new String(ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("core.js")));
+        String babelCode = new String(ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("babel.js")));
+        SimpleBindings bindings = new SimpleBindings();
+        babelEngine.eval(coreCode,bindings);
+        babelEngine.eval(babelCode,bindings);
+        loader = new LoaderAPI(machine,babelEngine,bindings);
+        babel = (JSObject) babelEngine.eval("Babel",bindings);
+        sandbox.inject("loader", loader);
+        sandbox.eval("var temp = function(eval){return function(code){eval(loader.eval(code))}}(eval); eval = temp;");
+      }catch(IOException e){
+        m.crash("Couldn't find babel.js");
+      }catch(ScriptException e){
+        m.crash("Couldn't initialize babel "+e.getMessage());
+      }
+    }
   }
   
   public void runSync() {
@@ -67,6 +95,10 @@ public class NashornAPI {
       try{
         byte[] biosIn = (byte[])machine.invoke(eepromAddress,"get",new Object[0])[0];
         bios = new String(biosIn);
+        System.out.println("Got BIOS");
+        if(runBabel){
+          bios = loader.eval(bios);
+        }
         sandbox.eval(bios);
       } catch(LimitReachedException e){
         return new ExecutionResult.Error("Shouldn't run out of invoke requests on the first one.  Report to mod author");
@@ -74,7 +106,6 @@ public class NashornAPI {
         e.printStackTrace();
         return new ExecutionResult.Error(e.getMessage());
       }
-      System.out.println("Got BIOS");
       initialized=true;
     }else{
       if(invokeList.size()>0){
