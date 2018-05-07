@@ -3,15 +3,16 @@ package me.mrmakeit.ocjs;
 import li.cil.oc.api.machine.Architecture;
 import li.cil.oc.api.machine.ExecutionResult;
 import li.cil.oc.api.machine.Machine;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-@Architecture.Name("JavaScript")
-public class JavascriptArch implements Architecture {
+@Architecture.Name("Nashorn:ES5")
+public class NashornArch implements Architecture {
   private Machine machine;
-  private JavascriptAPI vm;
+  private NashornAPI vm;
   
-  public JavascriptArch(Machine machine) {
+  public NashornArch(Machine machine) {
     this.machine = machine;
   }
   
@@ -25,9 +26,7 @@ public class JavascriptArch implements Architecture {
 
   @Override
   public boolean initialize() {
-    vm = new JavascriptAPI(machine);
-    vm.init();
-    vm.addComputer();
+    vm = new NashornAPI(machine,false);
     return true;
   }
 
