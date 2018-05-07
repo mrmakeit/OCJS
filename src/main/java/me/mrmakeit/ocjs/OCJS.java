@@ -29,7 +29,11 @@ public class OCJS
       System.out.println("[JAVASCRIPT] No debugging libraries available.  Not enabled");
     }
 
-    li.cil.oc.api.Machine.add(JavascriptArch.class);
+    LoaderAPI.get().getReady();
+    li.cil.oc.api.Machine.add(NashornArch.class);
+    if(LoaderAPI.get().isReady()){
+      li.cil.oc.api.Machine.add(NashornBabelArch.class);
+    }
 
     try {
       byte[] code = ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("bios.js"));
