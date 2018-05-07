@@ -1,7 +1,6 @@
 var dec2string = function(arr){
-	string = ""
+	var string = ""
 	for(var x in arr){
-    computer.print(arr[x]);
 		string = string + String.fromCharCode(arr[x])
 	}
 	return string
@@ -14,14 +13,11 @@ var error = function(text){
 var getComponentList = function(type){
 	var allComp = computer.list();
 	var results = []
-	for(comp in allComp){
-		computer.print(comp);
-		computer.print(allComp[comp]);
+	for(var comp in allComp){
 		if(allComp[comp] == type){
 			results.push(comp);
 		}
 	}
-	computer.print(JSON.stringify(results));
 	return results;
 }
 
@@ -38,23 +34,22 @@ var loadFrom = function(address, success){
         computer.invoke(address,"read",[handle, Number.MAX_VALUE],readData,function(error){});
       }else{
         computer.invoke(address,'close', [handle], function(){
-          computer.print(buffer);
           success();
           eval(buffer); 
         }, function(){});
       }
     }
     computer.invoke(address,"read",[handle, Number.MAX_VALUE],readData,function(error){});
-  },function(error){});
+  },function(error){
+  });
 }
 
 var setScreens = function(){
-	computer.print("Setting Screens");
 	var screen = getComponentList('screen')[0];
 	var gpu = getComponentList('gpu')[0];
 	if(screen){
 		if(gpu){
-			computer.invokeSync(gpu, 'bind', [screen]);
+      computer.invoke(gpu, 'bind', [screen],function(_){},function(_){});
 		}
 	}
 }
@@ -67,20 +62,22 @@ var init = function(){
     }
   }
   runOne = false;
-	computer.print("Running BIOS Init");
 	setScreens();
 	var drives = getComponentList('filesystem')
 	if(drives.length>0){
-		for(drive in drives){
-			address = drives[drive];
+		for(var drive in drives){
+			var address = drives[drive];
 			loadFrom(address,function(){
         ready = true;
+        break;
       })
 		}
 	}
+  if(!ready){
+    computer.error("Couldn't find /init.js on any bootable drives.")
+  }
 }
 
 var runOne = true;
 var ready = false;
-computer.next(init);
-computer.direct();
+init();
