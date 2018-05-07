@@ -24,14 +24,15 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - dependencies-
 
-      - run: gradle setupCiWorkspace
+      #use gradlew for now as 4.7 seems to not build the 1.7.10 version correctly.
+      - run: ./gradlew setupCiWorkspace
 
       - save_cache:
           paths:
             - ~/.m2
           key: dependencies-{{ .Branch }}
         
-      - run: gradle build
+      - run: ./gradlew build
 
       - store_artifacts:
           path: ~/repo/build/libs
