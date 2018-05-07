@@ -8,6 +8,8 @@ import java.util.concurrent.Executors;
 
 import javax.script.*;
 
+import com.google.common.io.ByteStreams;
+
 import delight.nashornsandbox.*;
 
 import jdk.nashorn.api.scripting.*;
@@ -38,12 +40,14 @@ public class NashornAPI {
     sandbox.inject("computer", new ComputerAPI(machine,this));
     loader = LoaderAPI.get();
     sandbox.inject("loader", loader);
-    if(enableBabel){
-      try{
-        sandbox.eval("var babelEval = function(eval){return function(code){eval(loader.eval(code))}}(eval)"); 
-      }catch(ScriptException e){
-        System.err.println("Can't rebuild eval.  No babel support. Error Message: "+e.getMessage());
-      }
+    try{
+      String bootCode = new String(ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("evalPlugin.js")));
+      sandbox.eval(bootCode);
+      sandbox.eval("var babelEval = loader.es6Eval"); 
+    }catch(IOException e){
+      System.err.println("Couldn't find babel.js");
+    }catch(ScriptException e){
+      System.err.println("Can't rebuild eval.  No babel support. Error Message: "+e.getMessage());
     }
   }
   
