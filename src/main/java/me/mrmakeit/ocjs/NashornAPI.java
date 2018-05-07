@@ -8,8 +8,6 @@ import java.util.concurrent.Executors;
 
 import javax.script.*;
 
-import com.google.common.io.ByteStreams;
-
 import delight.nashornsandbox.*;
 
 import jdk.nashorn.api.scripting.*;
@@ -19,8 +17,6 @@ public class NashornAPI {
 
   Machine machine;
   NashornSandbox sandbox;
-  JSObject babel;
-  ScriptEngine babelEngine;
   State state;
   LoaderAPI loader;
   boolean runBabel;
@@ -30,28 +26,23 @@ public class NashornAPI {
   public boolean initialized = false;
   
   public NashornAPI(Machine m,boolean enableBabel) {
-    babelEngine = new ScriptEngineManager().getEngineByName("nashorn");
     this.runBabel = enableBabel;
     machine = m;
     sandbox = NashornSandboxes.create();
-    sandbox.setMaxCPUTime(200);
+    if(enableBabel){
+      sandbox.setMaxCPUTime(4000);
+    }else{
+      sandbox.setMaxCPUTime(200);
+    }
     sandbox.setExecutor(Executors.newSingleThreadExecutor());
     sandbox.inject("computer", new ComputerAPI(machine,this));
+    loader = LoaderAPI.get();
+    sandbox.inject("loader", loader);
     if(enableBabel){
       try{
-        String coreCode = new String(ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("core.js")));
-        String babelCode = new String(ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("babel.js")));
-        SimpleBindings bindings = new SimpleBindings();
-        babelEngine.eval(coreCode,bindings);
-        babelEngine.eval(babelCode,bindings);
-        loader = new LoaderAPI(machine,babelEngine,bindings);
-        babel = (JSObject) babelEngine.eval("Babel",bindings);
-        sandbox.inject("loader", loader);
-        sandbox.eval("var temp = function(eval){return function(code){eval(loader.eval(code))}}(eval); eval = temp;");
-      }catch(IOException e){
-        m.crash("Couldn't find babel.js");
+        sandbox.eval("var babelEval = function(eval){return function(code){eval(loader.eval(code))}}(eval)"); 
       }catch(ScriptException e){
-        m.crash("Couldn't initialize babel "+e.getMessage());
+        System.err.println("Can't rebuild eval.  No babel support. Error Message: "+e.getMessage());
       }
     }
   }
@@ -74,32 +65,21 @@ public class NashornAPI {
   public ExecutionResult runThreaded(boolean syncReturn) {
     state = State.SLEEP;
     if(!initialized){
-      System.out.println("Running Init");
       String eepromAddress = "";
       Map<String, String> components = machine.components();
-      System.out.println("Getting EEPROM Address");
       for( Map.Entry<String,String> entry: components.entrySet()){
-        System.out.println(entry.getValue());
-        System.out.println(entry.getKey());
         if("eeprom".equals(entry.getValue())){
           eepromAddress = entry.getKey();
         }
       }
       if(eepromAddress.isEmpty()){
-        System.out.println("No EEPROM");
         return new ExecutionResult.Error("No EEPROM");
       }
-      System.out.println("Found EEPROM "+eepromAddress);
       String bios = "";
-      System.out.println("Getting BIOS");
       try{
         byte[] biosIn = (byte[])machine.invoke(eepromAddress,"get",new Object[0])[0];
         bios = new String(biosIn);
-        System.out.println("Got BIOS");
-        if(runBabel){
-          bios = loader.eval(bios);
-        }
-        sandbox.eval(bios);
+        sandbox.eval(loader.eval(bios));
       } catch(LimitReachedException e){
         return new ExecutionResult.Error("Shouldn't run out of invoke requests on the first one.  Report to mod author");
       } catch(Exception e){

@@ -1,7 +1,6 @@
 var dec2string = function(arr){
-	string = ""
+	var string = ""
 	for(var x in arr){
-    computer.print(arr[x]);
 		string = string + String.fromCharCode(arr[x])
 	}
 	return string
@@ -14,14 +13,11 @@ var error = function(text){
 var getComponentList = function(type){
 	var allComp = computer.list();
 	var results = []
-	for(comp in allComp){
-		computer.print(comp);
-		computer.print(allComp[comp]);
+	for(var comp in allComp){
 		if(allComp[comp] == type){
 			results.push(comp);
 		}
 	}
-	computer.print(JSON.stringify(results));
 	return results;
 }
 
@@ -37,11 +33,10 @@ var loadFrom = function(address, success){
         buffer = buffer + data;
         computer.invoke(address,"read",[handle, Number.MAX_VALUE],readData,function(error){});
       }else{
-        computer.invoke(address,'close', [handle], function(_){
-          computer.print(buffer);
+        computer.invoke(address,'close', [handle], function(){
           success();
           eval(buffer); 
-        }, function(_){});
+        }, function(){});
       }
     }
     computer.invoke(address,"read",[handle, Number.MAX_VALUE],readData,function(error){});
@@ -50,7 +45,6 @@ var loadFrom = function(address, success){
 }
 
 var setScreens = function(){
-	computer.print("Setting Screens");
 	var screen = getComponentList('screen')[0];
 	var gpu = getComponentList('gpu')[0];
 	if(screen){
@@ -68,14 +62,14 @@ var init = function(){
     }
   }
   runOne = false;
-	computer.print("Running BIOS Init");
 	setScreens();
 	var drives = getComponentList('filesystem')
 	if(drives.length>0){
-		for(drive in drives){
-			address = drives[drive];
+		for(var drive in drives){
+			var address = drives[drive];
 			loadFrom(address,function(){
         ready = true;
+        break;
       })
 		}
 	}
