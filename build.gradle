@@ -57,7 +57,7 @@ dependencies {
     compile "li.cil.oc:OpenComputers:MC1.7.10-1.7.+:api"
     compile files('libs/*');
     embed 'org.javadelight:delight-nashorn-sandbox:0.1.13'
-    compile files('libs/nashorn.jar');
+    embed files('libs/nashorn.jar');
       
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
