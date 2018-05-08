@@ -50,7 +50,7 @@ dependencies {
     compile "li.cil.oc:OpenComputers:MC1.11.2-1.7.+:api"
     embed 'org.mozilla:rhino:1.7.7.2'
     embed 'org.javadelight:delight-nashorn-sandbox:0.1.13'
-    compile files('libs/nashorn.jar');
+    embed files('libs/nashorn.jar');
       
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
