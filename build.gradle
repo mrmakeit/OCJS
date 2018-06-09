@@ -17,7 +17,7 @@ buildscript {
 apply plugin: 'forge'
 //Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
  
-version = "0.6.1"
+version = "0.6.2"
 group= "me.mrmakeit.ocjs" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ocjs"
 
@@ -53,11 +53,9 @@ dependencies {
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
-    embed 'org.mozilla:rhino:1.7.7.2'
     compile "li.cil.oc:OpenComputers:MC1.7.10-1.7.+:api"
-    compile files('libs/*');
-    embed 'org.javadelight:delight-nashorn-sandbox:0.1.13'
     embed files('libs/nashorn.jar');
+    embed files('libs/delight-nashorn-sandbox.jar');
       
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env

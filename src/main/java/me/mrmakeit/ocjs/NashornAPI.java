@@ -41,11 +41,7 @@ public class NashornAPI {
     loader = LoaderAPI.get();
     sandbox.inject("loader", loader);
     try{
-      String bootCode = new String(ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("evalPlugin.js")));
-      sandbox.eval(bootCode);
       sandbox.eval("var babelEval = loader.es6Eval"); 
-    }catch(IOException e){
-      System.err.println("Couldn't find babel.js");
     }catch(ScriptException e){
       System.err.println("Can't rebuild eval.  No babel support. Error Message: "+e.getMessage());
     }
@@ -83,7 +79,10 @@ public class NashornAPI {
       try{
         byte[] biosIn = (byte[])machine.invoke(eepromAddress,"get",new Object[0])[0];
         bios = new String(biosIn);
-        sandbox.eval(loader.eval(bios));
+        if(this.runBabel){
+          bios = loader.eval(bios);
+        }
+        sandbox.eval(bios);
       } catch(LimitReachedException e){
         return new ExecutionResult.Error("Shouldn't run out of invoke requests on the first one.  Report to mod author");
       } catch(Exception e){

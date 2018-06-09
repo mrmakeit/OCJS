@@ -68,14 +68,9 @@ var init = function(){
 		for(var drive in drives){
 			var address = drives[drive];
 			loadFrom(address,function(){
-        ready = true;
-        break;
       })
 		}
 	}
-  if(!ready){
-    computer.error("Couldn't find /init.js on any bootable drives.")
-  }
 }
 
 var runOne = true;
