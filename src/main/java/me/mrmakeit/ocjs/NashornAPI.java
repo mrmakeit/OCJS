@@ -1,14 +1,11 @@
 package me.mrmakeit.ocjs;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
 import javax.script.*;
-
-import com.google.common.io.ByteStreams;
 
 import delight.nashornsandbox.*;
 
