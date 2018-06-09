@@ -49,6 +49,7 @@ dependencies {
     //compile "some.group:artifact:version"
     embed 'org.mozilla:rhino:1.7.7.2'
     embed 'org.javadelight:delight-nashorn-sandbox:0.1.13'
+    embed 'org.slf4j:slf4j-api:1.7.25'
     compile "li.cil.oc:OpenComputers:MC1.10.2-1.7.+:api"
     embed files('libs/nashorn.jar');
       
