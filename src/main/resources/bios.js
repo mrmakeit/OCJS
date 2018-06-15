@@ -1,18 +1,14 @@
-var dec2string = function(arr){
-	var string = ""
+function decodeRead(arr){
+	var string = "";
 	for(var x in arr){
-		string = string + String.fromCharCode(arr[x])
+		string = string + String.fromCharCode(arr[x]);
 	}
-	return string
+	return string;
 }
 
-var error = function(text){
-	computer.error(text);
-}
-
-var getComponentList = function(type){
+function getComponentList(type){
 	var allComp = computer.list();
-	var results = []
+	var results = [];
 	for(var comp in allComp){
 		if(allComp[comp] == type){
 			results.push(comp);
@@ -21,7 +17,7 @@ var getComponentList = function(type){
 	return results;
 }
 
-var loadFrom = function(address, success){
+function loadFrom(address, success){
   computer.invoke(address, 'open', ['/init.js'],function(handle){
     if(!handle){
       return;
@@ -29,7 +25,7 @@ var loadFrom = function(address, success){
     var buffer = "";
     var readData = function(results){ 
       if(results){
-        var data = dec2string(results);
+        var data = decodeRead(results);
         buffer = buffer + data;
         computer.invoke(address,"read",[handle, Number.MAX_VALUE],readData,function(error){});
       }else{
@@ -44,7 +40,7 @@ var loadFrom = function(address, success){
   });
 }
 
-var setScreens = function(){
+function setScreens(){
 	var screen = getComponentList('screen')[0];
 	var gpu = getComponentList('gpu')[0];
 	if(screen){
@@ -54,7 +50,7 @@ var setScreens = function(){
 	}
 }
 
-var init = function(){
+function init(){
   if(!runOne){
     if(ready){
     }else{
