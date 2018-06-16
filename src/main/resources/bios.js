@@ -1,6 +1,4 @@
 /* This is the non-JSDOC Version */
-var _computer = Object(computer);
-
 function getCompList(type) {
     var allComp = computer.list();
     var results = [];
