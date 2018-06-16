@@ -6,6 +6,8 @@
  * 
  * Have Fun!
  */
+var _computer = Object(computer);
+
 /**
  * Get an Array of a Specific Type
  * @param {string} type The Specific type to get
@@ -115,7 +117,12 @@ setScreens(function (err) {
                                 computer.invoke(addr, "read", [handle, Number.MAX_VALUE], readData, function (err) { });
                             } else {
                                 computer.invoke(addr, 'close', [handle], function () {
-                                    eval(buffer);
+                                    try {
+                                        eval(buffer);
+                                    }
+                                    catch (err) {
+                                        computer.error(err);
+                                    }
                                 }, function () { });
                             }
                         }
