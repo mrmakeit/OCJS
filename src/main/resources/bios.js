@@ -1,4 +1,6 @@
 /* This is the non-JSDOC Version */
+var _computer = Object(computer);
+
 function getCompList(type) {
     var allComp = computer.list();
     var results = [];
@@ -87,7 +89,12 @@ setScreens(function (err) {
                                 computer.invoke(addr, "read", [handle, Number.MAX_VALUE], readData, function (err) { });
                             } else {
                                 computer.invoke(addr, 'close', [handle], function () {
-                                    eval(buffer);
+                                    try {
+                                        eval(buffer);
+                                    }
+                                    catch (err) {
+                                        computer.error(err);
+                                    }
                                 }, function () { });
                             }
                         }
