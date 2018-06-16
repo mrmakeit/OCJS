@@ -23,6 +23,7 @@ public class NashornAPI {
   LoaderAPI loader;
   boolean runBabel;
   boolean reboot = false;
+  int sleepTime = 0;
   List<InvokeCallback> invokeList = new ArrayList<InvokeCallback>();
 
   public boolean initialized = false;
@@ -34,16 +35,24 @@ public class NashornAPI {
     if(enableBabel){
       sandbox.setMaxCPUTime(4000);
     }else{
-      sandbox.setMaxCPUTime(200);
+      sandbox.setMaxCPUTime(500);
     }
     sandbox.setExecutor(Executors.newSingleThreadExecutor());
     sandbox.inject("computer", new ComputerAPI(machine,this));
     loader = LoaderAPI.get();
+    if(enableBabel){
     sandbox.inject("loader", loader);
     try{
-      sandbox.eval("var babelEval = loader.es6Eval"); 
+      String coreCode = new String(ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("core.js")));
+      String bootCode = new String(ByteStreams.toByteArray(OCJS.class.getClassLoader().getResourceAsStream("boot.js")));
+      sandbox.eval(coreCode);
+      sandbox.eval(bootCode);
+      sandbox.eval("babelEval = loader.es6Eval"); 
+    }catch(IOException e){
+      System.err.println("Couldn't find core.js");
     }catch(ScriptException e){
       System.err.println("Can't rebuild eval.  No babel support. Error Message: "+e.getMessage());
+    }
     }
   }
   
@@ -85,6 +94,9 @@ public class NashornAPI {
         sandbox.eval(bios);
       } catch(LimitReachedException e){
         return new ExecutionResult.Error("Shouldn't run out of invoke requests on the first one.  Report to mod author");
+      } catch(ScriptException e){
+        System.err.println("Javascript invoke error: "+e.getMessage());
+        return new ExecutionResult.Error(e.getMessage());
       } catch(Exception e){
         e.printStackTrace();
         return new ExecutionResult.Error(e.getMessage());
@@ -98,27 +110,29 @@ public class NashornAPI {
         }
         invokeList.subList(0,size).clear();
       }
+      ScriptObjectMirror onSignal = (ScriptObjectMirror)sandbox.get("onSignal");
       Signal next = machine.popSignal();
-      if(next != null){
-        Object[] resp = new Object[next.args().length+1];
-        resp[0] = next.name();
-        Object[] args = next.args();
-        for(int i = 0; i < args.length; i = i+1) {
-          resp[i+1] = args[i];
-        }
-        ScriptObjectMirror onSignal = (ScriptObjectMirror)sandbox.get("onSignal");
-        if(onSignal!=null){
+      if(onSignal==null){
+        machine.crash("No event loop.");
+      }else{
+        if(next != null){
+          Object[] resp = new Object[next.args().length+1];
+          resp[0] = next.name();
+          Object[] args = next.args();
+          for(int i = 0; i < args.length; i = i+1) {
+            resp[i+1] = args[i];
+          }
           onSignal.call(null,resp);
         }else{
-          machine.crash("No event loop.");
+          onSignal.call(null,null);
         }
       }
     }
     switch(state){
       case SHUTDOWN: return new ExecutionResult.Shutdown(reboot);
-      case SLEEP: return new ExecutionResult.Sleep(100);
+      case SLEEP: return new ExecutionResult.Sleep(this.sleepTime);
       case INVOKE: return new ExecutionResult.Sleep(0);
-      default: return new ExecutionResult.Sleep(100);
+      default: return new ExecutionResult.Sleep(this.sleepTime);
     }
   }
 }

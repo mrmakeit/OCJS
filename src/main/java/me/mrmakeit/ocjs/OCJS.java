@@ -12,27 +12,18 @@ import net.minecraftforge.fml.common.event.*;
 public class OCJS
 {
   public static final String MODID = "ocjs";
-  public static final String VERSION = "0.5.1";
-  static final String rhino = "transport=socket,suspend=n,address=9000";
-  Class<?> clazz;
-  public static Object debugger;
+  public static final String VERSION = "0.6.3";
+  boolean enableBabel = false;
 
   @EventHandler
   public void init(FMLInitializationEvent event)
   {
-    try {
-      clazz = Class.forName("org.eclipse.wst.jsdt.debug.rhino.debugger.RhinoDebugger");
-      debugger = clazz.getConstructor(String.class).newInstance(rhino);
-      clazz.getMethod("start").invoke(debugger);
-      System.out.println("[JAVASCRIPT] Debugging enabled.  Portn 9000");
-    } catch (Throwable e) {
-      System.out.println("[JAVASCRIPT] No debugging libraries available.  Not enabled");
-    }
-
     LoaderAPI.get().getReady();
     li.cil.oc.api.Machine.add(NashornArch.class);
-    if(LoaderAPI.get().isReady()){
-      li.cil.oc.api.Machine.add(NashornBabelArch.class);
+    if(enableBabel){
+      if(LoaderAPI.get().isReady()){
+        li.cil.oc.api.Machine.add(NashornBabelArch.class);
+      }
     }
 
     try {
@@ -45,11 +36,6 @@ public class OCJS
   }
   public void stopping(FMLServerStoppingEvent event)
   {
-    try{
-      clazz.getMethod("stop").invoke(debugger);
-    }catch(Exception e){
-
-    }
   }
 }
 

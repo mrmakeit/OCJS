@@ -1,4 +1,4 @@
-loader = function(es6loader,evalFunc){
+loader = (function(es6loader,evalFunc){
   return {
     es6Eval:function(code){
       code = es6loader.eval(code)
@@ -8,4 +8,4 @@ loader = function(es6loader,evalFunc){
       evalFunc(code);
     }
   }
-}(loader,eval);
+})(loader,eval);

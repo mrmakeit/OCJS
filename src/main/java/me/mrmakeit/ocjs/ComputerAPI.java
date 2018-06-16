@@ -63,6 +63,10 @@ public class ComputerAPI {
   public void onSignal(String name, Object[] args){
   }
 
+  public void setSleep(int time){
+    this.vm.sleepTime = time;
+  }
+
   public Object[] error(String message){
     boolean state = machine.crash(message);
     return new Object[]{state};
