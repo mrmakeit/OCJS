@@ -63,7 +63,7 @@ public class ComputerAPI {
   public void onSignal(String name, Object[] args){
   }
 
-  public void setSleep(int time){
+  public void sleep(int time){
     this.vm.sleepTime = time;
   }
 
