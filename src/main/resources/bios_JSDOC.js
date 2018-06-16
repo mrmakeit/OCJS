@@ -6,8 +6,6 @@
  * 
  * Have Fun!
  */
-var _computer = Object(computer);
-
 /**
  * Get an Array of a Specific Type
  * @param {string} type The Specific type to get
