@@ -7,6 +7,12 @@ Setup dev environment
 
 If you need javascript debugging, add org.eclipse.wst.jsdt.debug.* files from Eclipse wst
 
+## Development
+
+ForgeGradle supports IDEA and Eclipse by default.  You can setup each by running the following commands:
+
+Eclipse: `./gradlew eclise`
+IDEA: `./gradlew idea`
 ## Building
 
 `./gradlew build`
