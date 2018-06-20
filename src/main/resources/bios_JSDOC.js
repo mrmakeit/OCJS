@@ -1,4 +1,15 @@
-/* This is the non-JSDOC Version */
+/*
+ * This is the JSDOC Version
+ * here is mostly all documented
+ * It can't be included in the normal, because it would be to oversized for the EEPROM
+ * So, use it only if the limit is higher, or to dev with it
+ * 
+ * Have Fun!
+ */
+/**
+ * Get an Array of a Specific Type
+ * @param {string} type The Specific type to get
+ */
 function getCompList(type) {
     var allComp = computer.list();
     var results = [];
@@ -10,6 +21,10 @@ function getCompList(type) {
     return results;
 }
 
+/**
+ * Set Default screen
+ * @param {function} cb Callback, with nothing or Error
+ */
 function setScreens(cb, addr) {
     if (typeof addr != 'string') addr = null;
     var gpu = getCompList('gpu')[0];
@@ -32,6 +47,10 @@ function setScreens(cb, addr) {
     }
 }
 
+/**
+ * Start a Scan for an init.js file
+ * @param {function} cb Callback
+ */ 
 function scaninit(cb) {
     var drives = getCompList('filesystem');
     if (drives.length <= 0) computer.error('no filesystems installed!');
@@ -39,7 +58,7 @@ function scaninit(cb) {
     saw(function (cb) {
         index++;
         if (index <= drives.length - 1) {
-            computer.invoke(drives[index], 'exists', ["/init.js"], function (b) { //clear lowest line
+            computer.invoke(drives[index], 'exists', ["/init.js"], function (b) { 
                 if (b) {
                     cb(false, drives[index]);
                 } else cb(true);
@@ -56,6 +75,11 @@ function scaninit(cb) {
     });
 }
 
+/**
+ * Calles func always until the callback is false
+ * @param {function} func function that gets always called
+ * @param {function} end callback when ends
+ */
 function saw(func, end) {
     func(function (again, back) {
         if (again) {
@@ -64,6 +88,10 @@ function saw(func, end) {
     });
 }
 
+/**
+ * Convert what you get from a filesystem readstream
+ * @param {any[]} arr Array for Bytestream or so
+ */
 function decodeRead(arr) {
     var string = "";
     for (var x in arr) {
@@ -78,7 +106,7 @@ setScreens(function (err) {
     computer.invoke(gpu, 'getResolution', [], function (x, y) {
         computer.invoke(gpu, 'setBackground', [0], function () {
             computer.invoke(gpu, 'fill', [1, 1, x, y, " "], function () {
-                scaninit(function (addr) {
+                scaninit(/**@param {string} addr*/function (addr) {
                     computer.invoke(addr, 'open', ['/init.js'], function (handle) {
                         var buffer = '';
                         function readData(results) {
@@ -88,7 +116,12 @@ setScreens(function (err) {
                             } else {
                                 computer.invoke(addr, 'close', [handle], function () {
                                     try {
-                                        onSignal = eval(buffer);
+                                        onSignal = eval(buffer); // this is that "onSignal" can be defined (the os must make it like so:)
+                                        /**
+                                         * function t() { write('got signal') }
+                                         * // and return it with
+                                         * t // without the "()"
+                                         */ 
                                     }
                                     catch (err) {
                                         computer.error(err);
@@ -98,7 +131,7 @@ setScreens(function (err) {
                         }
                         computer.invoke(addr, "read", [handle, Number.MAX_VALUE], readData, function (err) { });
                     }, function () {
-                        computer.print('Cloud not open "init.js" on ' + addr);
+                        computer.print('Cloud not open "init.js" on '+addr);
                     });
                 });
             }, function () {
