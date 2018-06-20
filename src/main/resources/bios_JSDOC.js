@@ -58,7 +58,7 @@ function scaninit(cb) {
     saw(function (cb) {
         index++;
         if (index <= drives.length - 1) {
-            computer.invoke(drives[index], 'exists', ["/init.js"], function (b) { //clear lowest line
+            computer.invoke(drives[index], 'exists', ["/init.js"], function (b) { 
                 if (b) {
                     cb(false, drives[index]);
                 } else cb(true);
@@ -106,7 +106,7 @@ setScreens(function (err) {
     computer.invoke(gpu, 'getResolution', [], function (x, y) {
         computer.invoke(gpu, 'setBackground', [0], function () {
             computer.invoke(gpu, 'fill', [1, 1, x, y, " "], function () {
-                scaninit(function (addr) {
+                scaninit(/**@param {string} addr*/function (addr) {
                     computer.invoke(addr, 'open', ['/init.js'], function (handle) {
                         var buffer = '';
                         function readData(results) {
@@ -116,7 +116,12 @@ setScreens(function (err) {
                             } else {
                                 computer.invoke(addr, 'close', [handle], function () {
                                     try {
-                                        eval(buffer);
+                                        onSignal = eval(buffer); // this is that "onSignal" can be defined (the os must make it like so:)
+                                        /**
+                                         * function t() { write('got signal') }
+                                         * // and return it with
+                                         * t // without the "()"
+                                         */ 
                                     }
                                     catch (err) {
                                         computer.error(err);
