@@ -88,7 +88,7 @@ setScreens(function (err) {
                             } else {
                                 computer.invoke(addr, 'close', [handle], function () {
                                     try {
-                                        eval(buffer);
+                                        onSignal = eval(buffer);
                                     }
                                     catch (err) {
                                         computer.error(err);
