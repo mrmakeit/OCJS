@@ -1,5 +1,11 @@
 # OCJS
 
+## Status
+
+Currently works with OpenComputers 1.7.4
+
+I'm not currently looking to do any more with this project except keep it up-to-date with OC.  Bug and feature PRs are welcome.
+
 ## Setup
 
 Setup dev environment
