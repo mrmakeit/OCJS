@@ -4,7 +4,9 @@
 
 Currently works with OpenComputers 1.7.4
 
-I'm not currently looking to do any more with this project except keep it up-to-date with OC.  Bug and feature PRs are welcome.
+This project is now part of Code Shelter.  If you want to help maintain it, click the badge below and sign up.  I'll still be checking PR's and issues, and trying to keep it up-to-date with OC, but no long-term maintance is expected.
+
+[![Code Shelter](https://www.codeshelter.co/static/badges/badge-flat.svg)](https://www.codeshelter.co/)
 
 ## Setup
 
